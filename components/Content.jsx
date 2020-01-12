@@ -21,7 +21,7 @@ class Content extends React.Component{
 const styles = StyleSheet.create({
 	content : {
 		backgroundColor: 'powderblue',
-		flex: 5,
+		flex: 4,
 	},
 	content_text : {
 		textAlign: "center"

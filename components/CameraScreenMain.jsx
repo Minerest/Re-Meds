@@ -13,7 +13,6 @@ class CameraScreenMain extends React.Component {
 			hasCameraPermission: null, // This changes to "Granted" by the camera API once the users gives permission
 			type: Camera.Constants.Type.back, // Not the face camera, but the other camera on the phone
 			actively_scanning: true,	// bool to check to see if we're scanning barcodes rn or not.
-			data: null // request data
 		};
 	}
 
@@ -42,7 +41,8 @@ class CameraScreenMain extends React.Component {
 			// we first get the data string and turn it into a javascript object
 			(data) => data.json()).then( (data) => {
 				// the interesting stuff should go here.
-				this.setState({data: data});
+				// console.log(data);
+				this.props.check_upc_data(data);
 			}
 		);
 	};
@@ -63,6 +63,9 @@ class CameraScreenMain extends React.Component {
 															  onTouchStart={ () => this.setState({actively_scanning: true})}>
 						<Text>Scanned</Text>
 					</View>)}
+					<View style={styles.menubutton} onTouchStart={this.props.menu}>
+						<Text>MAIN MENU</Text>
+					</View>
 				</View>
 			);
 		}
@@ -81,6 +84,10 @@ const styles = StyleSheet.create({
 	textview: {
 		backgroundColor: "white",
 		height: 40
+	},
+	menubutton: {
+		height: 25,
+		backgroundColor: "lightblue"
 	}
 });
 

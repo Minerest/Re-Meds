@@ -7,9 +7,11 @@ class SideBar extends React.Component {
 	render(){
 		return (
 			<View style={styles.sidebar}>
-				<Text style={styles.sidebar_option}>Camera</Text>
+				<Text style={styles.sidebar_option}
+				onTouchStart={this.props.cam}>Camera</Text>
 				<Text style={styles.sidebar_option}>About Me </Text>
 				<Text style={styles.sidebar_option}>Purpose</Text>
+				<Text style={styles.sidebar_option}>Drugs And Interactions</Text>
 			</View>
 		)
 	};
