@@ -11,7 +11,7 @@ class SideBar extends React.Component {
 				onTouchStart={this.props.cam}>Camera</Text>
 				<Text style={styles.sidebar_option}>About Me </Text>
 				<Text style={styles.sidebar_option}>Purpose</Text>
-				<Text style={styles.sidebar_option}>Drugs And Interactions</Text>
+				<Text style={styles.sidebar_option} onTouchStart={this.props.goto_drugs}>Drugs</Text>
 			</View>
 		)
 	};

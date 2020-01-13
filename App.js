@@ -1,9 +1,9 @@
 import React from 'react';
-import {StyleSheet, View, Text} from "react-native";
+import {StyleSheet} from "react-native";
 
 import CameraScreenMain from "./components/CameraScreenMain.jsx";
 import MainMenu from "./components/MainMenu.jsx";
-import MockApp from './components/Mockapp.jsx';
+import DrugMenu from './components/DrugMenu.jsx';
 
 export default class App extends React.Component {
 
@@ -12,16 +12,23 @@ export default class App extends React.Component {
 
 		this.state = {
 			appletts : {
-				"MainMenu": <MainMenu cam={() => this.change_to_camera()}/>,
+				"MainMenu": <MainMenu goto_drugs={() => this.goto_drugs()} cam={() => this.change_to_camera()}/>,
 				"BarcodeReader": <CameraScreenMain
 					check_upc_data={(data) => this.check_upc_data(data)} menu={() => this.change_to_menu()}/>
 			},
-			currently_rendering: <MainMenu cam={() => this.change_to_camera()}/>,
+			currently_rendering: <MainMenu goto_drugs={() => this.goto_drugs()} cam={() => this.change_to_camera()}/>,
 			data: []
 		};
 		this.change_to_camera = this.change_to_camera.bind(this);
 		this.change_to_menu = this.change_to_menu.bind(this);
 		this.check_upc_data = this.check_upc_data.bind(this);
+		this.goto_drugs = this.goto_drugs.bind(this);
+	}
+
+	goto_drugs(){
+		this.setState({
+			currently_rendering: <DrugMenu drugs={this.state.data} menu={this.change_to_menu}/>
+		});
 	}
 
 	check_upc_data(data){
