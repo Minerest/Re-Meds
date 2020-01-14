@@ -30,10 +30,7 @@ class CameraScreenMain extends React.Component {
 
 		// Make sure to stop scanning after a barcode is read.
 		this.setState({actively_scanning: false});
-		console.log(type);
 
-		const new_data = data.substr(1);
-		console.log(new_data);
 		//the actual request goes here. Make sure you append the data from the barcode at the end
 		fetch("https://api.fda.gov/drug/label.json?search=openfda.upc:" + data).then(
 
@@ -41,7 +38,7 @@ class CameraScreenMain extends React.Component {
 			// we first get the data string and turn it into a javascript object
 			(data) => data.json()).then( (data) => {
 				// the interesting stuff should go here.
-				// console.log(data);
+				console.log(data);
 				this.props.check_upc_data(data);
 			}
 		);
