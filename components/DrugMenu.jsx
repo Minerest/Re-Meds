@@ -1,34 +1,56 @@
 import React from 'react'
-import {Text, View, StyleSheet} from "react-native";
+import {Text, View, StyleSheet, ScrollView, SafeAreaView} from "react-native";
 
 
 function DrugMenu(props) {
-		console.log(props.drugs);
+		// console.log(props.drugs);
 
-		return (
-			<View>
-				{ props.drugs.map(
-				(item) => {
-					return(
-					<View style={styles.drug_item}>
-						<Text>{item.results[0].purpose}</Text>
-						<Text>{item.results[0].active_ingredient}</Text>
-						<Text>{item.results[0].warnings}</Text>
+		const items_to_render = props.drugs.map(
+			(item) => {
+				// console.log(item.results[0].active_ingredient);
+				return(
+					<View style={styles.drug_item} key={item.results[0].openfda.upc}>
+						<Text style={styles.drug_header}>{item.results[0].openfda.brand_name[0]}</Text>
+						<View style={{flex:5}}>
+							<Text style={{flex:5}}>{item.results[0].active_ingredient}</Text>
+						</View>
+						{/*<Text style={{flex:1}}>{item.results[0].purpose}</Text>*/}
+						<Text style={{flex:8}}>{item.results[0].warnings}</Text>
 					</View>
-					)
-				}
 				)
-				}
-
-				<Text style={styles.stuff} onTouchStart={()=> props.menu() }> Menu </Text>
+			}
+		);
+		console.log(items_to_render);
+		return (
+			<View style={{flex:1}}>
+				<SafeAreaView style={{flex:9, marginTop: 30}}>
+					<ScrollView style={{flex:8}}>
+						{items_to_render}
+					</ScrollView>
+				</SafeAreaView>
+					<Text style={styles.menu_button} onTouchStart={()=> props.menu() }> Menu </Text>
 			</View>
 		)
 }
 
 const styles = StyleSheet.create({
-	stuff: {
-		marginTop: 50
+	menu_button: {
+		flex: 1,
+		// alignSelf: ,
+		backgroundColor: "blue",
+		height: 40,
+		color: "white",
+
+
+	},
+	drug_header: {
+		fontSize: 35,
+		flex: 1
+	},
+	drug_item: {
+		flex: 8,
+		margin: 20
 	}
-})
+});
 
 export default DrugMenu;

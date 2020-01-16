@@ -25,8 +25,8 @@ class CameraScreenMain extends React.Component {
 
 	handleBarcodeScan = ({type, data}) => {
 		// This is the function call made by the barcode scanner api once a barcode is found
-		//type is the barcode type
-		// and data is the data in the barcode
+		// 		type is the barcode type
+		// 		and data is the data in the barcode
 
 		// Make sure to stop scanning after a barcode is read.
 		this.setState({actively_scanning: false});
