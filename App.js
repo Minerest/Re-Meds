@@ -1,15 +1,18 @@
 import React from 'react';
 import {StyleSheet} from "react-native";
+import * as SQLite from 'expo-sqlite';
 
 import CameraScreenMain from "./components/CameraScreenMain.jsx";
 import MainMenu from "./components/MainMenu.jsx";
 import DrugMenu from './components/DrugMenu.jsx';
 
+
+
 export default class App extends React.Component {
 
 	constructor(props){
 		super(props);
-
+		this.db = SQLite.openDatabase("drugs.db");
 		this.state = {
 			appletts : {
 				"MainMenu": <MainMenu goto_drugs={() => this.goto_drugs()} cam={() => this.change_to_camera()}/>,
@@ -25,10 +28,29 @@ export default class App extends React.Component {
 		this.goto_drugs = this.goto_drugs.bind(this);
 	}
 
+	componentDidMount() {
+		this.db.transaction(tx => {
+			tx.executeSql(
+				"create table if not exists drugs (id integer primary key not null, " +
+				"brand_name string, manufacturer_name string, do_not_use string, stop_use string," +
+				"dosage_and_administration string, product_type string, purpose string;"
+			);
+			tx.executeSql(
+				"create table if not exists drug_ingredients (id integer primary key not null, " +
+				"active_ingredient string, drug_id integer references drugs(drugs.id);"
+			);
+			console.log("DB CREATION SUCCESS");
+		})
+	}
+
 	goto_drugs(){
 		this.setState({
 			currently_rendering: <DrugMenu drugs={this.state.data} menu={this.change_to_menu}/>
 		});
+	}
+
+	add_data_to_database(data){
+		console.log(data);
 	}
 
 	check_upc_data(data){
@@ -43,6 +65,7 @@ export default class App extends React.Component {
 		}
 		if (!data_found){
 			this.state.data.push(data);
+			this.add_data_to_database(data);
 			console.log("ADDED UPC DATA");
 		}
 		else {
@@ -64,31 +87,3 @@ export default class App extends React.Component {
 		)
 	}
 }
-
-const style = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: "blue",
-		flexDirection: "row"
-	},
-	sidebar : {
-		flex: 1,
-		backgroundColor: "black",
-		flexDirection: "column"
-	},
-
-	sidebar_option : {
-		backgroundColor: "yellow",
-		marginTop: 40,
-		textAlign: "center",
-		flex: 1
-	},
-	content : {
-		backgroundColor: 'powderblue',
-		flex: 5,
-	},
-	content_text : {
-		textAlign: "center",
-		flex: 5
-	}
-});

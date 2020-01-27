@@ -22,13 +22,13 @@ function DrugMenu(props) {
 		);
 		console.log(items_to_render);
 		return (
-			<View style={{flex:1}}>
+			<View style={{flex:1, justifyContent: "center", alignItems:"center"}}>
 				<SafeAreaView style={{flex:9, marginTop: 30}}>
 					<ScrollView style={{flex:8}}>
 						{items_to_render}
 					</ScrollView>
 				</SafeAreaView>
-					<Text style={styles.menu_button} onTouchStart={()=> props.menu() }> Menu </Text>
+				<Text style={styles.menu_button} onTouchStart={()=> props.menu() }> Menu </Text>
 			</View>
 		)
 }
@@ -36,10 +36,10 @@ function DrugMenu(props) {
 const styles = StyleSheet.create({
 	menu_button: {
 		flex: 1,
-		// alignSelf: ,
 		backgroundColor: "blue",
 		height: 40,
 		color: "white",
+
 
 
 	},
