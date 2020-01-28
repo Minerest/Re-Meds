@@ -34,12 +34,11 @@ export default class App extends React.Component {
 				"create table if not exists drugs (id integer primary key not null, " +
 				"brand_name string, manufacturer_name string, do_not_use string, stop_use string," +
 				"dosage_and_administration string, product_type string, purpose string;"
-			);
+			,[], () => console.log("db success"), (err) => console.log("db fail"));
 			tx.executeSql(
 				"create table if not exists drug_ingredients (id integer primary key not null, " +
-				"active_ingredient string, drug_id integer references drugs(drugs.id);"
-			);
-			console.log("DB CREATION SUCCESS");
+				"active_ingredient string, drug_id integer references drugs(drugs.id);", [],
+				() => console.log("db success"), (err) => console.log("ing fail"));
 		})
 	}
 
@@ -50,11 +49,24 @@ export default class App extends React.Component {
 	}
 
 	add_data_to_database(data){
-		console.log(data);
+		// console.log(data);
+		this.db.transaction(tx => {
+			tx.executeSql("insert into drugs (brand_name, manufacturer_name, do_not_use, stop_use," +
+				"dosage_and_administration, product_type, purpose) values(?, ?, ?, ?, ?, ?, ?)",
+				[data.openfda.brand_name, data.openfda.manufacturer_name, data.do_not_use, data.stop_use,
+					data.dosage_and_administration, data.openfda.product_type, data.purpose], (s) => console.log("Success"),
+				(err) => console.log("insert fail"));
+		});
+		this.db.transaction(tx => {
+				tx.executeSql("select * from drugs", [],
+					(_, {rows}) => console.log(JSON.stringify(rows)), (err) => console.log("select fail")
+				)
+			}
+		)
 	}
 
 	check_upc_data(data){
-		console.log(data.results[0].openfda.upc[0]);
+		// console.log(data.results[0].openfda.upc[0]);
 		let data_found = false;
 		for (let i = 0; i < this.state.data.length; i++){
 			for (let j = 0; j < data.results[0].openfda.upc.length; j++){
@@ -65,7 +77,7 @@ export default class App extends React.Component {
 		}
 		if (!data_found){
 			this.state.data.push(data);
-			this.add_data_to_database(data);
+			this.add_data_to_database(data.results[0]);
 			console.log("ADDED UPC DATA");
 		}
 		else {
