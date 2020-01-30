@@ -25,6 +25,7 @@ export default class App extends React.Component {
 			currently_rendering: <MainMenu goto_drugs={() => this.goto_drugs()} cam={() => this.change_to_camera()}/>,
 			data: []
 		};
+		this.upc_found = false;
 		this.change_to_camera = this.change_to_camera.bind(this);
 		this.change_to_menu = this.change_to_menu.bind(this);
 		this.check_upc_data = this.check_upc_data.bind(this);
@@ -34,10 +35,11 @@ export default class App extends React.Component {
 	componentDidMount() {
 		console.log('mount');
 		this.db.transaction(tx => {
+			tx.executeSql("drop table drugs");
 			tx.executeSql(
 				"create table if not exists drugs (id integer primary key not null, " +
 				"brand_name string, manufacturer_name string, do_not_use string, stop_use string," +
-				"dosage_and_administration string, product_type string, purpose string);"
+				"dosage_and_administration string, product_type string, purpose string, upc string);"
 			,[], () => console.log("db success"), (t, err) => console.log(t, err));
 			tx.executeSql(
 				"create table if not exists drug_ingredients (id integer primary key not null, " +
@@ -56,35 +58,40 @@ export default class App extends React.Component {
 		// console.log(data);
 		this.db.transaction(tx => {
 			tx.executeSql("insert into drugs (brand_name, manufacturer_name, do_not_use, stop_use," +
-				"dosage_and_administration, product_type, purpose) values(?, ?, ?, ?, ?, ?, ?)",
+				"dosage_and_administration, product_type, purpose, upc) values(?, ?, ?, ?, ?, ?, ?, ?)",
 				[data.openfda.brand_name, data.openfda.manufacturer_name, data.do_not_use, data.stop_use,
-					data.dosage_and_administration, data.openfda.product_type, data.purpose], (s) => console.log("Success"),
-				(err) => console.log("insert fail" + err));
+					data.dosage_and_administration, data.openfda.product_type, data.purpose, data.openfda.upc[0]], (s) => console.log("Success"),
+				(t, err) => console.log(t, err));
 		});
 		this.db.transaction(tx => {
 				tx.executeSql("select * from drugs", [],
 					(_, result) => {
-						console.log(result.rows.item(0).brand_name, _);
+						console.log(result.rows, _);
 					}, (err) => console.log("select fail" + err)
 				)
 			}
 		)
 	}
 
+	toggle_upc_found(){
+		this.upc_found = !this.upc_found;
+	}
+
 	check_upc_data(data){
 		// console.log(data.results[0].openfda.upc[0]);
 		let data_found = false;
-		for (let i = 0; i < this.state.data.length; i++){
-			for (let j = 0; j < data.results[0].openfda.upc.length; j++){
-				if (this.state.data[i].results[0].openfda.upc[i] === data.results[0].openfda.upc[j]){
-					data_found = true;
-				}
-			}
-		}
-		if (!data_found){
+
+		this.db.transaction(tx => {
+			tx.executeSql("select * from drugs where upc = ?", data.results[0].openfda.upc[0],
+				(tx, result) => {if (result.rows != 0) {this.toggle_upc_found()}},
+				(tx, err) => console.log(tx, err))
+
+		});
+		if (this.upc_found){
 			this.state.data.push(data);
 			this.add_data_to_database(data.results[0]);
 			console.log("ADDED UPC DATA");
+			this.toggle_upc_found();
 		}
 		else {
 			console.log("NOT ADDED UPC");
