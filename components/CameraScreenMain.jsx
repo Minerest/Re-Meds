@@ -30,8 +30,14 @@ class CameraScreenMain extends React.Component {
 
 		// Make sure to stop scanning after a barcode is read.
 		this.setState({actively_scanning: false});
-
-		//the actual request goes here. Make sure you append the data from the barcode at the end
+		let does_upc_exist = this.props.check_db_for_upc(data);
+		console.log("does_upc_exist", does_upc_exist);
+		if (!does_upc_exist) {
+			console.log("RETURNING");
+			return;
+		}
+		this.props.toggle_upc();
+		///the actual request goes here. Make sure you append the data from the barcode at the end
 		fetch("https://api.fda.gov/drug/label.json?search=openfda.upc:" + data).then(
 
 			// once the request comes back to us, the rest of the function executes.
@@ -39,7 +45,7 @@ class CameraScreenMain extends React.Component {
 			(data) => data.json()).then( (data) => {
 				// the interesting stuff should go here.
 				// console.log(data);
-				this.props.check_upc_data(data);
+				this.props.store_drug(data);
 			}
 		);
 	};

@@ -20,7 +20,9 @@ export default class App extends React.Component {
 			appletts : {
 				"MainMenu": <MainMenu goto_drugs={() => this.goto_drugs()} cam={() => this.change_to_camera()}/>,
 				"BarcodeReader": <CameraScreenMain
-					check_upc_data={(data) => this.check_upc_data(data)} menu={() => this.change_to_menu()}/>
+					store_drug={(data) => this.store_drug(data)} menu={() => this.change_to_menu()}
+					check_db_for_upc={(upc) => this.check_db_for_upc(upc)}
+					toggle_upc={() => this.toggle_upc_found()}/>
 			},
 			currently_rendering: <MainMenu goto_drugs={() => this.goto_drugs()} cam={() => this.change_to_camera()}/>,
 			data: []
@@ -28,14 +30,15 @@ export default class App extends React.Component {
 		this.upc_found = false;
 		this.change_to_camera = this.change_to_camera.bind(this);
 		this.change_to_menu = this.change_to_menu.bind(this);
-		this.check_upc_data = this.check_upc_data.bind(this);
+		this.store_drug = this.store_drug.bind(this);
 		this.goto_drugs = this.goto_drugs.bind(this);
+		this.check_db_for_upc = this.check_db_for_upc.bind(this);
 	}
 
 	componentDidMount() {
 		console.log('mount');
 		this.db.transaction(tx => {
-			tx.executeSql("drop table drugs");
+			// tx.executeSql("drop table drugs");
 			tx.executeSql(
 				"create table if not exists drugs (id integer primary key not null, " +
 				"brand_name string, manufacturer_name string, do_not_use string, stop_use string," +
@@ -77,25 +80,26 @@ export default class App extends React.Component {
 		this.upc_found = !this.upc_found;
 	}
 
-	check_upc_data(data){
-		// console.log(data.results[0].openfda.upc[0]);
-		let data_found = false;
-
+	check_db_for_upc(upc){
 		this.db.transaction(tx => {
-			tx.executeSql("select * from drugs where upc = ?", data.results[0].openfda.upc[0],
-				(tx, result) => {if (result.rows != 0) {this.toggle_upc_found()}},
+			tx.executeSql("select * from drugs where upc = ?", upc,
+				(tx, result) => {
+					console.log(result.rows);
+					if (result.rowsAffected !== 0) {this.toggle_upc_found()}
+				},
 				(tx, err) => console.log(tx, err))
-
+			console.log("UPC_CHECK", this.upc_found);
+			return this.upc_found;
 		});
-		if (this.upc_found){
-			this.state.data.push(data);
-			this.add_data_to_database(data.results[0]);
-			console.log("ADDED UPC DATA");
-			this.toggle_upc_found();
-		}
-		else {
-			console.log("NOT ADDED UPC");
-		}
+
+	}
+
+	store_drug(data){
+		// console.log(data.results[0].openfda.upc[0]);
+		this.state.data.push(data);
+		this.add_data_to_database(data.results[0]);
+		console.log("ADDED UPC DATA");
+		this.toggle_upc_found();
 	}
 
 	change_to_camera() {
