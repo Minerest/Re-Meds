@@ -1,5 +1,4 @@
 import React from 'react';
-import {StyleSheet} from "react-native";
 import * as SQLite from 'expo-sqlite';
 
 import CameraScreenMain from "./components/CameraScreenMain.jsx";
@@ -13,6 +12,10 @@ export default class App extends React.Component {
 	constructor(props){
 		super(props);
 		this.db = SQLite.openDatabase("drugs.db");
+		this.db.exec([{ sql: 'PRAGMA foreign_keys = ON;', args: [] }], false,
+			() =>
+			console.log('Foreign keys turned on')
+		);
 		this.state = {
 			appletts : {
 				"MainMenu": <MainMenu goto_drugs={() => this.goto_drugs()} cam={() => this.change_to_camera()}/>,
@@ -29,16 +32,17 @@ export default class App extends React.Component {
 	}
 
 	componentDidMount() {
+		console.log('mount');
 		this.db.transaction(tx => {
 			tx.executeSql(
 				"create table if not exists drugs (id integer primary key not null, " +
 				"brand_name string, manufacturer_name string, do_not_use string, stop_use string," +
-				"dosage_and_administration string, product_type string, purpose string;"
-			,[], () => console.log("db success"), (err) => console.log("db fail"));
+				"dosage_and_administration string, product_type string, purpose string);"
+			,[], () => console.log("db success"), (t, err) => console.log(t, err));
 			tx.executeSql(
 				"create table if not exists drug_ingredients (id integer primary key not null, " +
-				"active_ingredient string, drug_id integer references drugs(drugs.id);", [],
-				() => console.log("db success"), (err) => console.log("ing fail"));
+				"active_ingredient string, drug_id integer references drugs(id));", [],
+				() => console.log("ing success"), (t, err) => console.log(t, err));
 		})
 	}
 
@@ -55,11 +59,13 @@ export default class App extends React.Component {
 				"dosage_and_administration, product_type, purpose) values(?, ?, ?, ?, ?, ?, ?)",
 				[data.openfda.brand_name, data.openfda.manufacturer_name, data.do_not_use, data.stop_use,
 					data.dosage_and_administration, data.openfda.product_type, data.purpose], (s) => console.log("Success"),
-				(err) => console.log("insert fail"));
+				(err) => console.log("insert fail" + err));
 		});
 		this.db.transaction(tx => {
 				tx.executeSql("select * from drugs", [],
-					(_, {rows}) => console.log(JSON.stringify(rows)), (err) => console.log("select fail")
+					(_, result) => {
+						console.log(result.rows.item(0).brand_name, _);
+					}, (err) => console.log("select fail" + err)
 				)
 			}
 		)

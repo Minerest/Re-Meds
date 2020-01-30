@@ -20,7 +20,6 @@ function DrugMenu(props) {
 				)
 			}
 		);
-		console.log(items_to_render);
 		return (
 			<View style={{flex:1, justifyContent: "center", alignItems:"center"}}>
 				<SafeAreaView style={{flex:9, marginTop: 30}}>
