@@ -23,31 +23,32 @@ class CameraScreenMain extends React.Component {
 		});
 	}
 
-	handleBarcodeScan = ({type, data}) => {
+	handleBarcodeScan = async ({type, data}) => {
 		// This is the function call made by the barcode scanner api once a barcode is found
 		// 		type is the barcode type
 		// 		and data is the data in the barcode
 
 		// Make sure to stop scanning after a barcode is read.
 		this.setState({actively_scanning: false});
-		let does_upc_exist = this.props.check_db_for_upc(data);
-		console.log("does_upc_exist", does_upc_exist);
-		if (!does_upc_exist) {
-			console.log("RETURNING");
+		console.log("BEFORE AWAIT");
+		let does_upc_exist = await this.props.check_db_for_upc(data);
+		console.log("AFTER AWAIT: DOES UPC EXIST????", does_upc_exist);
+		if (does_upc_exist) {
+			console.log("::::::::::::::RETURNING");
 			return;
 		}
 		this.props.toggle_upc();
 		///the actual request goes here. Make sure you append the data from the barcode at the end
 		fetch("https://api.fda.gov/drug/label.json?search=openfda.upc:" + data).then(
-
 			// once the request comes back to us, the rest of the function executes.
 			// we first get the data string and turn it into a javascript object
-			(data) => data.json()).then( (data) => {
+			(data) => data.json()).then((data) => {
 				// the interesting stuff should go here.
 				// console.log(data);
+				console.log("FETCHING");
 				this.props.store_drug(data);
 			}
-		);
+		)
 	};
 
 	render() {

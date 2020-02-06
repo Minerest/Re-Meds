@@ -39,6 +39,8 @@ export default class App extends React.Component {
 		console.log('mount');
 		this.db.transaction(tx => {
 			// tx.executeSql("drop table drugs");
+
+			tx.executeSql("drop table drugs");
 			tx.executeSql(
 				"create table if not exists drugs (id integer primary key not null, " +
 				"brand_name string, manufacturer_name string, do_not_use string, stop_use string," +
@@ -80,18 +82,32 @@ export default class App extends React.Component {
 		this.upc_found = !this.upc_found;
 	}
 
-	check_db_for_upc(upc){
-		this.db.transaction(tx => {
-			tx.executeSql("select * from drugs where upc = ?", upc,
-				(tx, result) => {
-					console.log(result.rows);
-					if (result.rowsAffected !== 0) {this.toggle_upc_found()}
-				},
-				(tx, err) => console.log(tx, err))
-			console.log("UPC_CHECK", this.upc_found);
-			return this.upc_found;
-		});
+	async check_db_for_upc(upc){
+		return new Promise((resolve, reject) => {
 
+			let p = new Promise((resolve, reject)=> {
+				console.log("INNER P");
+				this.db.transaction(tx => {
+					tx.executeSql("select * from drugs where upc = ?", upc,
+						(tx, result) => {
+							console.log("QUERY", result.rows);
+							if (result.rows !== 0) {
+								console.log("UPC FOUND!");
+								this.toggle_upc_found();
+							} else {
+								console.log("UPC NOT FOUND:!:!@:#!@#$%");
+							}
+							console.log("THIS.UPC FOUND", this.upc_found);
+
+						},
+						(tx, err) => console.log(tx, err));
+				});
+				console.log("Resolveing??", this.upc_found);
+				resolve(this.upc_found);
+			});
+			console.log("Returning from async", p);
+			resolve(p);
+		})
 	}
 
 	store_drug(data){
