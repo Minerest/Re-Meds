@@ -62,12 +62,13 @@ export default class App extends React.Component {
 	}
 
 	add_data_to_database(data){
-
+console.log(data.openfda.brand_name[0], data.openfda.manufacturer_name[0], data.do_not_use[0], data.stop_use[0],
+	data.dosage_and_administration[0], data.openfda.product_type[0], data.purpose[0], data.openfda.upc[0]);
 		this.db.transaction(tx => {
 			tx.executeSql("insert into drugs (brand_name, manufacturer_name, do_not_use, stop_use," +
 				"dosage_and_administration, product_type, purpose, upc) values(?, ?, ?, ?, ?, ?, ?, ?)",
-				[data.openfda.brand_name, data.openfda.manufacturer_name, data.do_not_use, data.stop_use,
-					data.dosage_and_administration, data.openfda.product_type, data.purpose, data.openfda.upc[0]],
+				[data.openfda.brand_name[0], data.openfda.manufacturer_name[0], data.do_not_use[0], data.stop_use[0],
+					data.dosage_and_administration[0], data.openfda.product_type[0], data.purpose[0], data.openfda.upc[0]],
 				null,
 				(t, err) => console.log(t, err));
 		})
