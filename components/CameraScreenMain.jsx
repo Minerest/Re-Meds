@@ -30,9 +30,7 @@ class CameraScreenMain extends React.Component {
 
 		// Make sure to stop scanning after a barcode is read.
 		this.setState({actively_scanning: false});
-		console.log("BEFORE AWAIT");
 		let does_upc_exist = await this.props.check_db_for_upc(data);
-		console.log("AFTER AWAIT: DOES UPC EXIST????", does_upc_exist);
 		if (does_upc_exist) {
 			console.log("::::::::::::::RETURNING");
 			return;

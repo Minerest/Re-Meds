@@ -33,13 +33,14 @@ export default class App extends React.Component {
 		this.store_drug = this.store_drug.bind(this);
 		this.goto_drugs = this.goto_drugs.bind(this);
 		this.check_db_for_upc = this.check_db_for_upc.bind(this);
+		this.get_drugs = this.get_drugs.bind(this);
 	}
 
 	componentDidMount() {
 		console.log('mount');
 		this.db.transaction(tx => {
 			// tx.executeSql("drop table drugs");
-
+			console.log("Hello");
 			tx.executeSql("drop table drugs");
 			tx.executeSql(
 				"create table if not exists drugs (id integer primary key not null, " +
@@ -53,9 +54,12 @@ export default class App extends React.Component {
 		})
 	}
 
-	goto_drugs(){
+	async goto_drugs(){
+
+		let drugs = await this.get_drugs();
+		console.log("GOTO DRUGS", drugs);
 		this.setState({
-			currently_rendering: <DrugMenu drugs={this.state.data} menu={this.change_to_menu}/>
+			currently_rendering: <DrugMenu drugs={drugs} menu={this.change_to_menu}/>
 		});
 	}
 
@@ -88,7 +92,7 @@ export default class App extends React.Component {
 			let p = new Promise((resolve, reject)=> {
 				console.log("INNER P");
 				this.db.transaction(tx => {
-					tx.executeSql("select * from drugs where upc = ?", upc,
+					tx.executeSql("select * from drugs where upc = ?;", upc,
 						(tx, result) => {
 							console.log("QUERY", result.rows);
 							if (result.rows !== 0) {
@@ -116,6 +120,19 @@ export default class App extends React.Component {
 		this.add_data_to_database(data.results[0]);
 		console.log("ADDED UPC DATA");
 		this.toggle_upc_found();
+	}
+
+	async get_drugs(){
+		return new Promise((resolve, reject) => {
+			this.db.transaction(tx => {
+				tx.executeSql("select * from drugs;", null,
+					(tx, res) => {
+						console.log("RES.ROWS", res.rows);
+						resolve(res.rows);
+					}, (tx, err) => console.log(tx, err));
+			})
+
+		})
 	}
 
 	change_to_camera() {

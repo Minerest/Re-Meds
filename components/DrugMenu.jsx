@@ -3,19 +3,23 @@ import {Text, View, StyleSheet, ScrollView, SafeAreaView} from "react-native";
 
 
 function DrugMenu(props) {
-		// console.log(props.drugs);
+		// console.log("PROPS", props.drugs._array);
 
-		const items_to_render = props.drugs.map(
+		const items_to_render = props.drugs._array.map(
 			(item) => {
 				// console.log(item.results[0].active_ingredient);
+				console.log("ITEMS!!!", item);
+				console.log("upc", item.upc);
+				console.log("brand", item.brand_name);
+				console.log("active", item.active_ingredient);
 				return(
-					<View style={styles.drug_item} key={item.results[0].openfda.upc}>
-						<Text style={styles.drug_header}>{item.results[0].openfda.brand_name[0]}</Text>
+					<View style={styles.drug_item} key={item.upc}>
+						<Text style={styles.drug_header}>{item.brand_name}</Text>
 						<View style={{flex:5}}>
-							<Text style={{flex:5}}>{item.results[0].active_ingredient}</Text>
+							<Text style={{flex:5}}>{item.stop_use}</Text>
 						</View>
 						{/*<Text style={{flex:1}}>{item.results[0].purpose}</Text>*/}
-						<Text style={{flex:8}}>{item.results[0].warnings}</Text>
+						<Text style={{flex:8}}>{item.dosage_and_administration}</Text>
 					</View>
 				)
 			}
