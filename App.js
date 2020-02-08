@@ -40,7 +40,6 @@ export default class App extends React.Component {
 		console.log('mount');
 		this.db.transaction(tx => {
 			// tx.executeSql("drop table drugs");
-			console.log("Hello");
 			tx.executeSql("drop table drugs");
 			tx.executeSql(
 				"create table if not exists drugs (id integer primary key not null, " +
@@ -57,29 +56,21 @@ export default class App extends React.Component {
 	async goto_drugs(){
 
 		let drugs = await this.get_drugs();
-		console.log("GOTO DRUGS", drugs);
 		this.setState({
 			currently_rendering: <DrugMenu drugs={drugs} menu={this.change_to_menu}/>
 		});
 	}
 
 	add_data_to_database(data){
-		// console.log(data);
+
 		this.db.transaction(tx => {
 			tx.executeSql("insert into drugs (brand_name, manufacturer_name, do_not_use, stop_use," +
 				"dosage_and_administration, product_type, purpose, upc) values(?, ?, ?, ?, ?, ?, ?, ?)",
 				[data.openfda.brand_name, data.openfda.manufacturer_name, data.do_not_use, data.stop_use,
-					data.dosage_and_administration, data.openfda.product_type, data.purpose, data.openfda.upc[0]], (s) => console.log("Success"),
+					data.dosage_and_administration, data.openfda.product_type, data.purpose, data.openfda.upc[0]],
+				null,
 				(t, err) => console.log(t, err));
-		});
-		this.db.transaction(tx => {
-				tx.executeSql("select * from drugs", [],
-					(_, result) => {
-						console.log(result.rows, _);
-					}, (err) => console.log("select fail" + err)
-				)
-			}
-		)
+		})
 	}
 
 	toggle_upc_found(){
@@ -87,39 +78,21 @@ export default class App extends React.Component {
 	}
 
 	async check_db_for_upc(upc){
-		return new Promise((resolve, reject) => {
-
 			let p = new Promise((resolve, reject)=> {
 				console.log("INNER P");
 				this.db.transaction(tx => {
 					tx.executeSql("select * from drugs where upc = ?;", upc,
-						(tx, result) => {
-							console.log("QUERY", result.rows);
-							if (result.rows !== 0) {
-								console.log("UPC FOUND!");
-								this.toggle_upc_found();
-							} else {
-								console.log("UPC NOT FOUND:!:!@:#!@#$%");
-							}
-							console.log("THIS.UPC FOUND", this.upc_found);
-
-						},
+						null,
 						(tx, err) => console.log(tx, err));
 				});
-				console.log("Resolveing??", this.upc_found);
 				resolve(this.upc_found);
 			});
-			console.log("Returning from async", p);
-			resolve(p);
-		})
+			return p;
 	}
 
 	store_drug(data){
 		// console.log(data.results[0].openfda.upc[0]);
-		this.state.data.push(data);
 		this.add_data_to_database(data.results[0]);
-		console.log("ADDED UPC DATA");
-		this.toggle_upc_found();
 	}
 
 	async get_drugs(){
@@ -127,7 +100,6 @@ export default class App extends React.Component {
 			this.db.transaction(tx => {
 				tx.executeSql("select * from drugs;", null,
 					(tx, res) => {
-						console.log("RES.ROWS", res.rows);
 						resolve(res.rows);
 					}, (tx, err) => console.log(tx, err));
 			})

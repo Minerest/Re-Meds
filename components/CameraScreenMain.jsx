@@ -42,7 +42,6 @@ class CameraScreenMain extends React.Component {
 			// we first get the data string and turn it into a javascript object
 			(data) => data.json()).then((data) => {
 				// the interesting stuff should go here.
-				// console.log(data);
 				console.log("FETCHING");
 				this.props.store_drug(data);
 			}

@@ -7,11 +7,7 @@ function DrugMenu(props) {
 
 		const items_to_render = props.drugs._array.map(
 			(item) => {
-				// console.log(item.results[0].active_ingredient);
-				console.log("ITEMS!!!", item);
-				console.log("upc", item.upc);
-				console.log("brand", item.brand_name);
-				console.log("active", item.active_ingredient);
+
 				return(
 					<View style={styles.drug_item} key={item.upc}>
 						<Text style={styles.drug_header}>{item.brand_name}</Text>
