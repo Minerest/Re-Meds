@@ -62,31 +62,50 @@ export default class App extends React.Component {
 	}
 
 	add_data_to_database(data){
-console.log(data.openfda.brand_name[0], data.openfda.manufacturer_name[0], data.do_not_use[0], data.stop_use[0],
-	data.dosage_and_administration[0], data.openfda.product_type[0], data.purpose[0], data.openfda.upc[0]);
+		// I have to do this because the FDA assumes EVERYTHING is an array.
+		let brand_name = data.openfda.brand_name ? data.openfda.brand_name[0] : null;
+		let manf_name = data.openfda.manufacturer_name ? data.openfda.manufacturer_name[0] : null;
+		let dnu = data.do_not_use ? data.do_not_use[0] : null;
+		let stop_use = data.stop_use ? data.stop_use[0] : null;
+		let d_and_a = data.dosage_and_administration ? data.dosage_and_administration[0] : null;
+		let product_type = data.openfda.product_type ? data.openfda.product_type[0] : null;
+		let purpose = data.purpose ? data.purpose[0] : null;
+		let upc = data.openfda.upc ? data.openfda.upc[0] : null;
+
 		this.db.transaction(tx => {
 			tx.executeSql("insert into drugs (brand_name, manufacturer_name, do_not_use, stop_use," +
 				"dosage_and_administration, product_type, purpose, upc) values(?, ?, ?, ?, ?, ?, ?, ?)",
-				[data.openfda.brand_name[0], data.openfda.manufacturer_name[0], data.do_not_use[0], data.stop_use[0],
-					data.dosage_and_administration[0], data.openfda.product_type[0], data.purpose[0], data.openfda.upc[0]],
-				null,
-				(t, err) => console.log(t, err));
+				[brand_name, manf_name, dnu, stop_use, d_and_a, product_type, purpose, upc],
+				() =>console.log("SUCCESS"),
+				(t) => console.log(t));
 		})
+
+	}
+
+	toggle_upc_found1(){
+		console.log("TOGGLE", this.upc_found);
+		this.upc_found = !this.upc_found;
 	}
 
 	toggle_upc_found(){
-		this.upc_found = !this.upc_found;
+		this.upc_found = false;
 	}
 
 	async check_db_for_upc(upc){
 			let p = new Promise((resolve, reject)=> {
 				console.log("INNER P");
 				this.db.transaction(tx => {
-					tx.executeSql("select * from drugs where upc = ?;", upc,
-						null,
+					tx.executeSql("select * from drugs where upc = (?);", [upc],
+						(tx, res) => {
+							console.log("RESULT ROWS UPC CHECK", res.rows.length);
+							if (res.rows.length > 0) {
+								this.upc_found = true;
+							}
+							resolve(this.upc_found);
+						},
 						(tx, err) => console.log(tx, err));
 				});
-				resolve(this.upc_found);
+				console.log("CHECK DB FOR UPC", this.upc_found);
 			});
 			return p;
 	}
@@ -101,7 +120,8 @@ console.log(data.openfda.brand_name[0], data.openfda.manufacturer_name[0], data.
 			this.db.transaction(tx => {
 				tx.executeSql("select * from drugs;", null,
 					(tx, res) => {
-						resolve(res.rows);
+					console.log("RESULTS", res);
+					resolve(res.rows);
 					}, (tx, err) => console.log(tx, err));
 			})
 
