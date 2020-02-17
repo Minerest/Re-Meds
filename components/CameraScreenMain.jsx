@@ -31,12 +31,12 @@ class CameraScreenMain extends React.Component {
 		// Make sure to stop scanning after a barcode is read.
 		this.setState({actively_scanning: false});
 		let does_upc_exist = await this.props.check_db_for_upc(data);
-		console.log("DOES UPC EXIST!???", does_upc_exist)
 		if (does_upc_exist) {
 			this.props.toggle_upc();
 			return;
 		}
 		this.props.toggle_upc();
+		console.log("https://api.fda.gov/drug/label.json?search=openfda.upc:" + data);
 		///the actual request goes here. Make sure you append the data from the barcode at the end
 		fetch("https://api.fda.gov/drug/label.json?search=openfda.upc:" + data).then(
 			// once the request comes back to us, the rest of the function executes.
