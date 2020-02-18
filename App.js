@@ -40,6 +40,7 @@ export default class App extends React.Component {
 		this.goto_drugs = this.goto_drugs.bind(this);
 		this.check_db_for_upc = this.check_db_for_upc.bind(this);
 		this.get_drugs = this.get_drugs.bind(this);
+		this.get_interactions = this.get_interactions.bind(this);
 	}
 
 	componentDidMount() {
@@ -51,8 +52,7 @@ export default class App extends React.Component {
 			tx.executeSql(
 				"create table if not exists drugs (id integer primary key not null, " +
 				"brand_name string, manufacturer_name string, do_not_use string, stop_use string," +
-				"dosage_and_administration string, product_type string, purpose string, upc string, rxcui string," +
-				" d1 string, d2 string, d3 string, d4 string, d5 string, d6 string);"
+				"dosage_and_administration string, product_type string, purpose string, upc string, rxcui string);"
 			,[], () => console.log("db success"), (t, err) => console.log(t, err));
 			tx.executeSql(
 				"create table if not exists drug_ingredients (id integer primary key not null, " +
@@ -69,6 +69,24 @@ export default class App extends React.Component {
 		});
 	}
 
+	get_interactions(){
+		this.db.transaction( tx => {
+			tx.executeSql("select rxcui from drugs", [],(t, r) => {
+				let req_url = "https://rxnav.nlm.nih.gov/REST/interaction/list.json?rxcuis=";
+				for (let i = 0; i < r.rows.length; i++){
+					// get all the prescription identifiers. This will be used to check another API for drug interactions.
+					if (i < r.rows.length - 1){
+						req_url += r.rows._array[i].rxcui +"+";
+					}
+					else {
+						req_url += r.rows._array[i].rxcui;
+					}
+				}
+				console.log(req_url);
+				fetch(req_url).then(resp => resp.json().then(resp => console.log(resp)));
+			}, (t, e) => {console.log(t, e)})})
+	}
+
 	add_data_to_database(data){
 		// I have to do this because the FDA assumes EVERYTHING is an array.
 		let brand_name = data.openfda.brand_name ? data.openfda.brand_name[0] : null;
@@ -80,17 +98,10 @@ export default class App extends React.Component {
 		let purpose = data.purpose ? data.purpose[0] : null;
 		let upc = data.openfda.upc ? data.openfda.upc[0] : null;
 		let rxcui = data.openfda.rxcui ? data.openfda.rxcui[0]: null;
-		let d1 = data.openfda.substance_name ? data.openfda.substance_name[0] : null;
-		let d2 = data.openfda.substance_name ? data.openfda.substance_name[1] : null;
-		let d3 = data.openfda.substance_name ? data.openfda.substance_name[2] : null;
-		let d4 = data.openfda.substance_name ? data.openfda.substance_name[3] : null;
-		let d5 = data.openfda.substance_name ? data.openfda.substance_name[4] : null;
-		let d6 = data.openfda.substance_name ? data.openfda.substance_name[5] : null;
 		this.db.transaction(tx => {
 			tx.executeSql("insert into drugs (brand_name, manufacturer_name, do_not_use, stop_use," +
-				"dosage_and_administration, product_type, purpose, upc,rxcui, " +
-				"d1,d2,d3,d4,d5,d6) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-				[brand_name, manf_name, dnu, stop_use, d_and_a, product_type, purpose, upc,rxcui,d1,d2,d3,d4,d5,d6],
+				"dosage_and_administration, product_type, purpose, upc,rxcui) values(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+				[brand_name, manf_name, dnu, stop_use, d_and_a, product_type, purpose, upc,rxcui],
 				() =>console.log("SUCCESS"),
 				(t, e) => console.log("INSERT ERROR",e, t));
 
@@ -131,6 +142,7 @@ export default class App extends React.Component {
 				tx.executeSql("select * from drugs;", null,
 					(tx, res) => {
 					console.log(res.rows);
+					this.get_interactions();
 					resolve(res.rows);
 					}, (tx, err) => console.log(tx, err));
 			})
