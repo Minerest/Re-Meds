@@ -31,7 +31,8 @@ export default class App extends React.Component {
 					toggle_upc={() => this.toggle_upc_found()}/>
 			},
 			currently_rendering: <MainMenu goto_drugs={() => this.goto_drugs()} cam={() => this.change_to_camera()}/>,
-			data: []
+			data: [],
+			interactions: [],
 		};
 		this.upc_found = false;
 		this.change_to_camera = this.change_to_camera.bind(this);
@@ -83,7 +84,19 @@ export default class App extends React.Component {
 					}
 				}
 				console.log(req_url);
-				fetch(req_url).then(resp => resp.json().then(resp => console.log(resp)));
+				fetch(req_url)
+					.then(resp => resp.json())
+					.then(resp => {
+						let interactions = [];
+						let i = resp.fullInteractionTypeGroup.fullInteractionType;
+						interactions.append(i.map((item) => {
+							return ({
+								pair: [item.minConcept[0].rxcui, item.minConcept[1].rxcui],
+								description: item.interactionPair[0].description
+							})
+						}))
+						})
+					);
 			}, (t, e) => {console.log(t, e)})})
 	}
 
@@ -146,7 +159,6 @@ export default class App extends React.Component {
 					resolve(res.rows);
 					}, (tx, err) => console.log(tx, err));
 			})
-
 		})
 	}
 
