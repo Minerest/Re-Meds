@@ -4,7 +4,7 @@ import * as SQLite from 'expo-sqlite';
 import CameraScreenMain from "./components/CameraScreenMain.jsx";
 import MainMenu from "./components/MainMenu.jsx";
 import DrugMenu from './components/DrugMenu.jsx';
-
+import {Interactions} from './components/Interactions';
 // Drug interactions API. TODO: Use this
 // https://rxnav.nlm.nih.gov/REST/interaction/interaction.json?rxcui=209459
 
@@ -24,17 +24,20 @@ export default class App extends React.Component {
 		);
 		this.state = {
 			appletts : {
-				"MainMenu": <MainMenu goto_drugs={() => this.goto_drugs()} cam={() => this.change_to_camera()}/>,
+				"MainMenu": <MainMenu goto_interactions={()=>this.goto_interactions()}
+					goto_drugs={() => this.goto_drugs()} cam={() => this.change_to_camera()}/>,
 				"BarcodeReader": <CameraScreenMain
 					store_drug={(data) => this.store_drug(data)} menu={() => this.change_to_menu()}
 					check_db_for_upc={(upc) => this.check_db_for_upc(upc)}
 					toggle_upc={() => this.toggle_upc_found()}/>
 			},
-			currently_rendering: <MainMenu goto_drugs={() => this.goto_drugs()} cam={() => this.change_to_camera()}/>,
-			data: [],
+			currently_rendering: <MainMenu goto_interactions={()=>this.goto_interactions()}
+				goto_drugs={() => this.goto_drugs()} cam={() => this.change_to_camera()}/>,
+			data: {},
 			interactions: [],
 		};
 		this.upc_found = false;
+		this.current_drugs = [];
 		this.change_to_camera = this.change_to_camera.bind(this);
 		this.change_to_menu = this.change_to_menu.bind(this);
 		this.store_drug = this.store_drug.bind(this);
@@ -42,6 +45,7 @@ export default class App extends React.Component {
 		this.check_db_for_upc = this.check_db_for_upc.bind(this);
 		this.get_drugs = this.get_drugs.bind(this);
 		this.get_interactions = this.get_interactions.bind(this);
+		this.goto_interactions = this.goto_interactions.bind(this);
 	}
 
 	componentDidMount() {
@@ -62,6 +66,16 @@ export default class App extends React.Component {
 		})
 	}
 
+	goto_interactions(){
+		let data = {
+			drugs: this.current_drugs,
+			interactions: this.state.interactions
+		};
+		this.setState({
+			currently_rendering: <Interactions data={data}/>
+		})
+	}
+
 	async goto_drugs(){
 
 		let drugs = await this.get_drugs();
@@ -74,8 +88,10 @@ export default class App extends React.Component {
 		this.db.transaction( tx => {
 			tx.executeSql("select rxcui from drugs", [],(t, r) => {
 				let req_url = "https://rxnav.nlm.nih.gov/REST/interaction/list.json?rxcuis=";
+				let drugs = [];
 				for (let i = 0; i < r.rows.length; i++){
 					// get all the prescription identifiers. This will be used to check another API for drug interactions.
+					drugs[r.rows._array[i].rxcui] = r.rows._array[i].brand_name;
 					if (i < r.rows.length - 1){
 						req_url += r.rows._array[i].rxcui +"+";
 					}
@@ -83,20 +99,23 @@ export default class App extends React.Component {
 						req_url += r.rows._array[i].rxcui;
 					}
 				}
+				this.current_drugs = drugs;
 				console.log(req_url);
 				fetch(req_url)
 					.then(resp => resp.json())
 					.then(resp => {
-						let interactions = [];
-						let i = resp.fullInteractionTypeGroup.fullInteractionType;
-						interactions.append(i.map((item) => {
-							return ({
-								pair: [item.minConcept[0].rxcui, item.minConcept[1].rxcui],
-								description: item.interactionPair[0].description
-							})
-						}))
-						})
-					);
+							let interactions = [];
+							let i = resp.fullInteractionTypeGroup[0].fullInteractionType;
+							interactions.push(i.map((item) => {
+								return ({
+									pair: [item.minConcept[0].rxcui, item.minConcept[1].rxcui],
+									description: item.interactionPair[0].description
+								});
+							}));
+							this.setState({interactions:interactions});
+							console.log("INTERACTIONS", interactions);
+						}
+					)
 			}, (t, e) => {console.log(t, e)})})
 	}
 
