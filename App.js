@@ -63,17 +63,38 @@ export default class App extends React.Component {
 				"create table if not exists drug_ingredients (id integer primary key not null, " +
 				"active_ingredient string, drug_id integer references drugs(id));", [],
 				() => console.log("ing success"), (t, err) => console.log(t, err));
+		});
+
+		fetch("https://api.fda.gov/drug/label.json?search=openfda.upc:0305360970858").then(
+
+			(data) => data.json()).then((data) => {
+				this.store_drug(data);
+			}
+		)
+		fetch("https://api.fda.gov/drug/label.json?search=openfda.upc:0312547427555").then(
+			(data) => data.json()).then((data) => {
+			this.store_drug(data);
 		})
+
+		fetch("https://api.fda.gov/drug/label.json?search=openfda.upc:0305730169400").then(
+			(data) => data.json()).then((data) => {
+			this.store_drug(data);
+		})
+
+		fetch("https://api.fda.gov/drug/label.json?search=openfda.upc:0300450449108").then(
+			(data) => data.json()).then((data) => {
+			this.store_drug(data);
+		})
+
+
 	}
 
-	goto_interactions(){
-		let data = {
-			drugs: this.current_drugs,
-			interactions: this.state.interactions
-		};
+	async goto_interactions(){
+		let data = await this.get_interactions();
+		console.log("GOTO INTERACTIONS DATA", data);
 		this.setState({
-			currently_rendering: <Interactions data={data}/>
-		})
+				currently_rendering: <Interactions data={data}	/>
+			});
 	}
 
 	async goto_drugs(){
@@ -84,40 +105,49 @@ export default class App extends React.Component {
 		});
 	}
 
-	get_interactions(){
-		this.db.transaction( tx => {
-			tx.executeSql("select rxcui from drugs", [],(t, r) => {
-				let req_url = "https://rxnav.nlm.nih.gov/REST/interaction/list.json?rxcuis=";
-				let drugs = [];
-				for (let i = 0; i < r.rows.length; i++){
-					// get all the prescription identifiers. This will be used to check another API for drug interactions.
-					drugs[r.rows._array[i].rxcui] = r.rows._array[i].brand_name;
-					if (i < r.rows.length - 1){
-						req_url += r.rows._array[i].rxcui +"+";
-					}
-					else {
-						req_url += r.rows._array[i].rxcui;
-					}
-				}
-				this.current_drugs = drugs;
-				console.log(req_url);
-				fetch(req_url)
-					.then(resp => resp.json())
-					.then(resp => {
-							let interactions = [];
+	async get_interactions(){
+		let p = new Promise((resolve, reject) => {
+				this.db.transaction(tx => {
+					tx.executeSql("select * from drugs", [], (t, r) => {
+						let req_url = "https://rxnav.nlm.nih.gov/REST/interaction/list.json?rxcuis=";
+						let drugs = {};
+						drugs.interactions = [];
+						for (let i = 0; i < r.rows.length; i++) {
+							// get all the prescription identifiers. This will be used to check another API for drug interactions.
+							drugs[r.rows._array[i].rxcui] = r.rows._array[i].brand_name;
+							if (i < r.rows.length - 1) {
+								req_url += r.rows._array[i].rxcui + "+";
+							} else {
+								req_url += r.rows._array[i].rxcui;
+							}
+						}
+						console.log(req_url);
+						let d = fetch(req_url)
+							.then(resp => resp.json())
+							.then(resp => {
 							let i = resp.fullInteractionTypeGroup[0].fullInteractionType;
-							interactions.push(i.map((item) => {
+							drugs.interactions.push(i.map((item) => {
 								return ({
 									pair: [item.minConcept[0].rxcui, item.minConcept[1].rxcui],
 									description: item.interactionPair[0].description
 								});
 							}));
-							this.setState({interactions:interactions});
-							console.log("INTERACTIONS", interactions);
-						}
-					)
-			}, (t, e) => {console.log(t, e)})})
+						return drugs;
+						});
+
+						d.then(data => {
+							console.log(data);
+							resolve(data);
+							return data})
+					});
+
+					}, (t, e) => {
+						console.log(t, e)
+					})
+				})
+		return p;
 	}
+
 
 	add_data_to_database(data){
 		// I have to do this because the FDA assumes EVERYTHING is an array.
@@ -147,7 +177,7 @@ export default class App extends React.Component {
 
 	async check_db_for_upc(upc){
 			let p = new Promise((resolve, reject)=> {
-				console.log("INNER P");
+
 				this.db.transaction(tx => {
 					tx.executeSql("select * from drugs where upc = (?);", [upc],
 						(tx, res) => {
@@ -173,8 +203,7 @@ export default class App extends React.Component {
 			this.db.transaction(tx => {
 				tx.executeSql("select * from drugs;", null,
 					(tx, res) => {
-					console.log(res.rows);
-					this.get_interactions();
+
 					resolve(res.rows);
 					}, (tx, err) => console.log(tx, err));
 			})
@@ -192,6 +221,7 @@ export default class App extends React.Component {
 	render() {
 		return (
 			this.state.currently_rendering
-		)
+		);
 	}
+
 }
