@@ -21,7 +21,7 @@ class SideBar extends React.Component {
 
 let styles = StyleSheet.create({
 	sidebar : {
-		flex: 1,
+		flex: 3,
 		backgroundColor: "black",
 		flexDirection: "column"
 	},
@@ -29,7 +29,9 @@ let styles = StyleSheet.create({
 		backgroundColor: "yellow",
 		marginTop: 40,
 		textAlign: "center",
-		flex: 1
+		flex: 1,
+		overflow: "hidden",
+		borderRadius: 10,
 	}
 });
 export default SideBar;

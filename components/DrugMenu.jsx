@@ -6,11 +6,14 @@ function DrugMenu(props) {
 		// console.log("PROPS", props.drugs._array);
 		// FIELDS: brand_name, manufacturer_name, do_not_use, stop_use," +
 		// "dosage_and_administration, product_type, purpose, upc
+		let i = 0;
+		let odd_or_even
 		const items_to_render = props.drugs._array.map(
 			(item) => {
-
+				odd_or_even = i % 2 === 0 ? styles.odd : styles.even;
+				i++;
 				return(
-					<View style={styles.drug_item} key={item.upc}>
+					<View style={[styles.drug_item, odd_or_even]} key={item.upc}>
 						<Text style={styles.drug_header}>{item.brand_name}</Text>
 						<View style={{flex:5}}>
 							<Text style={styles.drug_subheader}>Purpose</Text>
@@ -34,24 +37,54 @@ function DrugMenu(props) {
 			}
 		);
 		return (
-			<View style={{flex:1, justifyContent: "center", alignItems:"center"}}>
+			<View style={{backgroundColor: "#ccd4db", flex:1, justifyContent: "center", alignItems:"center"}}>
+				<Text style={styles.header}>Drug Registered</Text>
 				<SafeAreaView style={{flex:9, marginTop: 30}}>
 					<ScrollView style={{flex:8}}>
 						{items_to_render}
 					</ScrollView>
 				</SafeAreaView>
-				<Text style={styles.menu_button} onTouchStart={()=> props.menu() }> Menu </Text>
+				<View style={styles.menuView} onTouchStart={()=>props.menu()} >
+					<Text style={styles.menuText} >Menu</Text>
+				</View>
 			</View>
 		)
 }
 
 const styles = StyleSheet.create({
-	menu_button: {
+	header:{
 		flex: 1,
+		fontSize: 40,
+		fontWeight: "bold",
+		marginTop: 30,
+
+	},
+	odd: {
+		backgroundColor: "#3492eb"
+	},
+	even:{
+		backgroundColor: "lightblue"
+	},
+
+	menuText: {
+		alignSelf: "center",
+		alignItems: "center",
+		color: "white",
+		fontSize: 25,
+
+	},
+	menuView: {
+
+		flex: 1,
+		minWidth: 100,
 		backgroundColor: "blue",
 		height: 40,
 		color: "white",
-
+		overflow: "hidden",
+		borderRadius: 20,
+		justifyContent: "center",
+		alignSelf: "center",
+		alignItems: "center",
 	},
 	drug_header: {
 		fontSize: 35,
@@ -64,8 +97,9 @@ const styles = StyleSheet.create({
 	},
 	drug_item: {
 		flex: 8,
-		margin: 20
-	}
+		padding: 40
+	},
+
 });
 
 export default DrugMenu;

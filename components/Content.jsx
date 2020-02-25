@@ -19,7 +19,7 @@ function Content(){
 const styles = StyleSheet.create({
 	content : {
 		backgroundColor: 'powderblue',
-		flex: 4,
+		flex: 8,
 	},
 	content_text : {
 		textAlign: "center"

@@ -14,7 +14,7 @@ class MainMenu extends React.Component {
 	render(){
 		return(
 			<View style={{flex:1}}>
-				<Text style={stylez.Header}>THIS IS THE HEADER</Text>
+				<Text style={stylez.Header}>Re:Meds</Text>
 				<View style={stylez.Container}>
 					<SideBar goto_interactions={this.props.goto_interactions}
 						cam={this.props.cam} goto_drugs={this.props.goto_drugs} active={this.sidebar_state} />
@@ -33,6 +33,7 @@ const stylez = StyleSheet.create({
 	},
 	Header: {
 		fontSize: 40,
+		fontWeight: "bold",
 		textAlign: "center",
 		paddingTop: 20,
 	}
