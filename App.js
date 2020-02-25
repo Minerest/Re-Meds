@@ -9,20 +9,33 @@ import {Interactions} from './components/Interactions';
 // https://rxnav.nlm.nih.gov/REST/interaction/interaction.json?rxcui=209459
 
 export default class App extends React.Component {
-
+	// The App object basically handles all of the data components.
+	// It, by itself, does not render any of the <Text />, however, it chooses which components to render.
 	constructor(props){
+		// Set up the App object
 		super(props);
+
+		// Create database "drugs.db" if it does not exist
 		this.db = SQLite.openDatabase("drugs.db");
+
+		// Turn on foreign keys
 		this.db.exec([{ sql: 'PRAGMA foreign_keys = ON;', args: [] }], false,
 			() =>
 			console.log('Foreign keys turned on')
 		);
+
+		// Print out the table column names for debugging purposes.
 		this.db.exec([{ sql: 'PRAGMA table_info(drugs);', args: [] }], false,
 			(t, r) => {
 				console.log(r[0].rows.map((x) => {return x.name}));
 			}
 		);
+
+		// Set the default state. The app rerenders when the state changes.
 		this.state = {
+
+			// The 'appletts' that render are stored in this dictionary/object.
+			// this.state.appletts["MainMenu"] renders the main menu component.
 			appletts : {
 				"MainMenu": <MainMenu goto_interactions={()=>this.goto_interactions()}
 					goto_drugs={() => this.goto_drugs()} cam={() => this.change_to_camera()}/>,
@@ -93,7 +106,7 @@ export default class App extends React.Component {
 		let data = await this.get_interactions();
 		console.log("GOTO INTERACTIONS DATA", data);
 		this.setState({
-				currently_rendering: <Interactions data={data}	/>
+				currently_rendering: <Interactions data={data}	menu={()=>this.change_to_menu()}/>
 			});
 	}
 

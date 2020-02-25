@@ -59,10 +59,10 @@ class CameraScreenMain extends React.Component {
 			return (
 				<View style={{flex: 1}}>
 					<BarCodeScanner style={styles.camera} type={this.state.type}
-									onBarCodeScanned={ !this.state.actively_scanning ? undefined : this.handleBarcodeScan}
+									onBarCodeScanned={!this.state.actively_scanning ? undefined : this.handleBarcodeScan}
 					/>
 					{!this.state.actively_scanning && (<View  style={styles.textview}
-															  onTouchStart={ () => this.setState({actively_scanning: true})}>
+															  onTouchStart={() => this.setState({actively_scanning: true})}>
 						<Text>Scanned</Text>
 					</View>)}
 					<View style={styles.menubutton} onTouchStart={this.props.menu}>
