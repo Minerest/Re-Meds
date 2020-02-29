@@ -13,6 +13,7 @@ class CameraScreenMain extends React.Component {
 			hasCameraPermission: null, // This changes to "Granted" by the camera API once the users gives permission
 			type: Camera.Constants.Type.back, // Not the face camera, but the other camera on the phone
 			actively_scanning: true,	// bool to check to see if we're scanning barcodes rn or not.
+			error: ""
 		};
 	}
 
@@ -44,6 +45,10 @@ class CameraScreenMain extends React.Component {
 			(data) => data.json()).then((data) => {
 				// the interesting stuff should go here.
 				console.log("FETCHING");
+				if (data.error){
+					this.setState({error: "WARNING, UPC NOT FOUND!"});
+					return;
+				}
 				this.props.store_drug(data);
 			}
 		)
@@ -62,8 +67,10 @@ class CameraScreenMain extends React.Component {
 									onBarCodeScanned={!this.state.actively_scanning ? undefined : this.handleBarcodeScan}
 					/>
 					{!this.state.actively_scanning && (<View  style={styles.textview}
-															  onTouchStart={() => this.setState({actively_scanning: true})}>
-						<Text>Scanned</Text>
+															  onTouchStart={() => this.setState({
+																  error: "",
+																  actively_scanning: true})}>
+						<Text>Scanned {this.state.error}</Text>
 					</View>)}
 					<View style={styles.menubutton} onTouchStart={this.props.menu}>
 						<Text>MAIN MENU</Text>
