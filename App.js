@@ -51,6 +51,7 @@ export default class App extends React.Component {
 		};
 		this.upc_found = false;
 		this.current_drugs = [];
+		this.debugging = true;
 		this.change_to_camera = this.change_to_camera.bind(this);
 		this.change_to_menu = this.change_to_menu.bind(this);
 		this.store_drug = this.store_drug.bind(this);
@@ -59,6 +60,15 @@ export default class App extends React.Component {
 		this.get_drugs = this.get_drugs.bind(this);
 		this.get_interactions = this.get_interactions.bind(this);
 		this.goto_interactions = this.goto_interactions.bind(this);
+	}
+
+	debug_fetcher(arr){
+		for (let i = 0; i < arr.length; i++){
+			fetch("https://api.fda.gov/drug/label.json?search=openfda.upc:" + arr[i]).then(
+				(data) => data.json()).then((data) => {
+				this.store_drug(data);
+			});
+		}
 	}
 
 	componentDidMount() {
@@ -78,28 +88,9 @@ export default class App extends React.Component {
 				() => console.log("ing success"), (t, err) => console.log(t, err));
 		});
 
-		fetch("https://api.fda.gov/drug/label.json?search=openfda.upc:0305360970858").then(
+		let arr = ["0305360970858","0312547427555", "0305730169400","0300450449108", "0041100809643"]
 
-			(data) => data.json()).then((data) => {
-				this.store_drug(data);
-			}
-		)
-		fetch("https://api.fda.gov/drug/label.json?search=openfda.upc:0312547427555").then(
-			(data) => data.json()).then((data) => {
-			this.store_drug(data);
-		})
-
-		fetch("https://api.fda.gov/drug/label.json?search=openfda.upc:0305730169400").then(
-			(data) => data.json()).then((data) => {
-			this.store_drug(data);
-		})
-
-		fetch("https://api.fda.gov/drug/label.json?search=openfda.upc:0300450449108").then(
-			(data) => data.json()).then((data) => {
-			this.store_drug(data);
-		})
-
-
+		this.debug_fetcher(arr);
 	}
 
 	async goto_interactions(){

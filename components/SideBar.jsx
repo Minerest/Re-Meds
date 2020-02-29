@@ -23,11 +23,14 @@ let styles = StyleSheet.create({
 	sidebar : {
 		flex: 3,
 		backgroundColor: "black",
-		flexDirection: "column"
+		flexDirection: "column",
+		paddingRight: 10,
+
 	},
 	sidebar_option : {
 		backgroundColor: "yellow",
 		marginTop: 40,
+		marginLeft: 10,
 		textAlign: "center",
 		flex: 1,
 		overflow: "hidden",
