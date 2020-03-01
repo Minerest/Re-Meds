@@ -34,7 +34,7 @@ export class SearchBar extends React.Component {
 
 					return(
 						<View key={item.id} style={[style_even_odd, styles.drug_item]}>
-							<View style={{flex:8}}>
+							<View style={{flex:7}}>
 								<Text style={styles.drug_header}>
 									{item.openfda.brand_name[0]}
 								</Text>
@@ -48,12 +48,13 @@ export class SearchBar extends React.Component {
 
 								</Text>
 							</View>
-							<View style={{flex:3, backgroundColor:"white",
-								height: 70,
+							<View style={{flex:3, backgroundColor:"blue",
+								height: 70, borderRadius: 20, marginLeft: 40,
 								justifyContent: "flex-end", alignItems:"center", alignContent:"center", flexDirection: "row"}}
 								onTouchStart={()=>this.props.store_item(item)}
 							>
-								<Text style={{alignItems:"center", alignContent:"center", justifyContent: "center", paddingRight:"25%"}}>
+								<Text style={{alignItems:"center", alignContent:"center",
+									color:"white", justifyContent: "center", paddingRight:"25%"}}>
 									Store Drug
 								</Text>
 							</View>
