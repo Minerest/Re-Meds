@@ -65,7 +65,7 @@ export default class App extends React.Component {
 		};
 		this.upc_found = false;
 		this.current_drugs = [];
-		this.debugging = true;
+		this.debugging = false;
 		this.change_to_camera = this.change_to_camera.bind(this);
 		this.change_to_menu = this.change_to_menu.bind(this);
 		this.store_drug = this.store_drug.bind(this);
@@ -104,9 +104,9 @@ export default class App extends React.Component {
 				() => console.log("ing success"), (t, err) => console.log(t, err));
 		});
 
-		let arr = ["0305360970858","0312547427555", "0305730169400","0300450449108", "0041100809643"]
-
-		this.debug_fetcher(arr);
+		let arr = ["0305360970858","0312547427555", "0305730169400","0300450449108", "0041100809643"];
+		if (this.debugging)
+			this.debug_fetcher(arr); // gets a set of drugs and stores them onstartup.
 	}
 
 	async goto_interactions(){

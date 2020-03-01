@@ -77,13 +77,10 @@ export class SearchBar extends React.Component {
 		return(
 			<View style={{backgroundColor: "#ccd4db", flex:1}}>
 				<View style={{flex:1, margin: "auto", alignContent:"center", flexDirection:"row"}}>
-					<TextInput onChangeText={text => this.change_input(text)}
-							   placeholder="Enter a drug"
+					<TextInput onChangeText={text => this.change_input(text)} autoCorrect={false}
+							   placeholder="Enter a drug" onSubmitEditing={()=>this.search()}
 							   editable={this.state.text_editable}
 							   style={{flex:9, marginTop: 30, alignItems:"center", textAlign: "center", backgroundColor: "white", alignContent:"center"}}/>
-					<View style={{backgroundColor: "blue", flex:2, flexDirection:"row",marginTop: 30, justifyContent:"center", alignItems: "center"}}>
-						<Text onTouchStart={()=>this.search()} style={{color: "white", alignSelf:"center", justifyContent:"center"}}>Search</Text>
-					</View>
 				</View>
 				<View style={{flex:6}}>
 					<ScrollView style={{flex:8}}>

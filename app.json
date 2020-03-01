@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "RE:Meds",
-    "slug": "remeds",
+    "slug": "REMeds",
     "privacy": "public",
     "sdkVersion": "36.0.0",
     "platforms": [
@@ -23,7 +23,9 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.remeds.remeds",
+      "buildNumber": "1.0.0"
     },
     "android": {
         "package" : "com.remeds.remeds"
