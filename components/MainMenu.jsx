@@ -17,7 +17,8 @@ class MainMenu extends React.Component {
 				<Text style={stylez.Header}>RE:Meds</Text>
 				<View style={stylez.Container}>
 					<SideBar goto_interactions={this.props.goto_interactions}
-						cam={this.props.cam} goto_drugs={this.props.goto_drugs} active={this.sidebar_state} />
+							 goto_searchbar={this.props.goto_searchbar}
+							 cam={this.props.cam} goto_drugs={this.props.goto_drugs} active={this.sidebar_state} />
 					<Content />
 				</View>
 			</View>

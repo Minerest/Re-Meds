@@ -1,6 +1,7 @@
 import React from 'react';
 import * as SQLite from 'expo-sqlite';
 
+import {SearchBar} from "./components/SearchBar.jsx";
 import CameraScreenMain from "./components/CameraScreenMain.jsx";
 import MainMenu from "./components/MainMenu.jsx";
 import DrugMenu from './components/DrugMenu.jsx';
@@ -37,15 +38,28 @@ export default class App extends React.Component {
 			// The 'appletts' that render are stored in this dictionary/object.
 			// this.state.appletts["MainMenu"] renders the main menu component.
 			appletts : {
-				"MainMenu": <MainMenu goto_interactions={()=>this.goto_interactions()}
-					goto_drugs={() => this.goto_drugs()} cam={() => this.change_to_camera()}/>,
+				"MainMenu": 	<MainMenu goto_interactions={()=>this.goto_interactions()}
+										  goto_searchbar={()=>this.goto_searchbar()}
+										  goto_drugs={() => this.goto_drugs()} cam={() => this.change_to_camera()}/>,
+
 				"BarcodeReader": <CameraScreenMain
-					store_drug={(data) => this.store_drug(data)} menu={() => this.change_to_menu()}
+
+					store_drug={(data) 		=> this.store_drug(data)}
+					menu={() 				=> this.change_to_menu()}
 					check_db_for_upc={(upc) => this.check_db_for_upc(upc)}
-					toggle_upc={() => this.toggle_upc_found()}/>
+					toggle_upc={() 			=> this.toggle_upc_found()}
+				/>,
+
+				"SearchBar":	<SearchBar
+					menu={()				=>this.change_to_menu()}
+					store_item={(item) => this.add_data_to_database(item)}
+				/>
 			},
-			currently_rendering: <MainMenu goto_interactions={()=>this.goto_interactions()}
-				goto_drugs={() => this.goto_drugs()} cam={() => this.change_to_camera()}/>,
+			currently_rendering: <MainMenu goto_searchbar={()=>this.goto_searchbar()}
+										   goto_interactions={()=>this.goto_interactions()}
+										   goto_drugs={() => this.goto_drugs()}
+										   cam={() => this.change_to_camera()}
+			/>,
 			data: {},
 			interactions: [],
 		};
@@ -60,6 +74,7 @@ export default class App extends React.Component {
 		this.get_drugs = this.get_drugs.bind(this);
 		this.get_interactions = this.get_interactions.bind(this);
 		this.goto_interactions = this.goto_interactions.bind(this);
+		this.goto_searchbar = this.goto_searchbar.bind(this);
 	}
 
 	debug_fetcher(arr){
@@ -107,6 +122,12 @@ export default class App extends React.Component {
 		this.setState({
 			currently_rendering: <DrugMenu drugs={drugs} menu={this.change_to_menu}/>
 		});
+	}
+
+	goto_searchbar(){
+		this.setState({currently_rendering: <SearchBar
+				store_item={(item) => this.add_data_to_database(item)}
+				menu={()=>this.change_to_menu()} />})
 	}
 
 	async get_interactions(){

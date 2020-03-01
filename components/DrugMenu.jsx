@@ -44,7 +44,7 @@ function DrugMenu(props) {
 						{items_to_render}
 					</ScrollView>
 				</SafeAreaView>
-				<View style={styles.menuView} onTouchStart={()=>props.menu()} >
+				<View style={styles.menuView} onTouchStart={()=> props.menu()} >
 					<Text style={styles.menuText} >Menu</Text>
 				</View>
 			</View>
