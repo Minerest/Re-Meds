@@ -14,56 +14,105 @@ export class SearchBar extends React.Component {
 
 
 	search(){
-		const brand_name = this.current_text;
-		this.setState({
+		// This is the search function. It queries the FDA API for drugs based by name
+		const brand_name = this.current_text; // Get the text from the <TextInput /> field
+
+		this.setState({ // This stops the change of the textinput field and shows a Loading text while we make the web request
 			results:<Text style={{fontSize: 25, marginRight:"auto", marginLeft:"auto"}}>LOADING</Text>,
 			editable:false});
+
+		// This below is the actual request being made. The api is the string below, take note of the use of quotes
 		fetch('https://api.fda.gov/drug/label.json?search=openfda.brand_name:"' + brand_name + '"&limit=100')
+			// turn the raw text into a javascript object
 			.then(raw_data => raw_data.json())
 			.then(data => {
 				if (data.error){
-					const not_found_text = <Text>"The results you searched for where not found."</Text>
+					// the FDA only returns an error field if the drug is not found or if there are server errors.
+					// So I'm just going to return that the drugs are not found
+					const not_found_text = <Text>"The results you searched for where not found."</Text>;
 					this.setState({results:not_found_text});
 					return null;
 				}
-				let even_or_odd = true;
-				let to_render = data.results.map((item) => {
-					console.log(item);
-					even_or_odd = !even_or_odd;
-					let style_even_odd = even_or_odd ? styles.even:styles.odd;
 
-					return(
-						<View key={item.id} style={[style_even_odd, styles.drug_item]}>
-							<View style={{flex:7}}>
-								<Text style={styles.drug_header}>
-									{item.openfda.brand_name[0]}
-								</Text>
-								<Text>
-									{item.openfda.manufacturer_name}
-								</Text>
-								<Text>
-									{item.openfda.product_type}
-								</Text>
-								<Text>
-
-								</Text>
-							</View>
-							<View style={{flex:3, backgroundColor:"blue",
-								height: 70, borderRadius: 20, marginLeft: 40,
-								justifyContent: "flex-end", alignItems:"center", alignContent:"center", flexDirection: "row"}}
-								onTouchStart={()=>this.props.store_item(item)}
-							>
-								<Text style={{alignItems:"center", alignContent:"center",
-									color:"white", justifyContent: "center", paddingRight:"25%"}}>
-									Store Drug
-								</Text>
-							</View>
-						</View>
-					)
-				})
+				// boolean to determine the color of the item.
+				let to_render = this.get_items(data);
+				//
+				// 	data.results.map((item) => {
+				// 	console.log(item);
+				// 	even_or_odd = !even_or_odd;
+				// 	let style_even_odd = even_or_odd ? styles.even:styles.odd;
+				//
+				// 	return(
+				// 		<View key={item.id} style={[style_even_odd, styles.drug_item]}>
+				// 			<View style={{flex:7}}>
+				// 				<Text style={styles.drug_header}>
+				// 					{item.openfda.brand_name[0]}
+				// 				</Text>
+				// 				<Text>
+				// 					{item.openfda.manufacturer_name}
+				// 				</Text>
+				// 				<Text>
+				// 					{item.openfda.product_type}
+				// 				</Text>
+				// 				<Text>
+				//
+				// 				</Text>
+				// 			</View>
+				// 			<View style={{flex:3, backgroundColor:"blue",
+				// 				height: 70, borderRadius: 20, marginLeft: 40,
+				// 				justifyContent: "flex-end", alignItems:"center", alignContent:"center", flexDirection: "row"}}
+				// 				onTouchStart={()=>this.props.store_item(item)}
+				// 			>
+				// 				<Text style={{alignItems:"center", alignContent:"center",
+				// 					color:"white", justifyContent: "center", paddingRight:"25%"}}>
+				// 					Store Drug
+				// 				</Text>
+				// 			</View>
+				// 		</View>
+				// 	)
+				// })
 				this.setState({results:to_render});
 			}).then(() => {this.setState({text_editable:true})})
 
+	}
+
+	get_items(data){
+		// returns an array of items to be rendered
+		let even_or_odd = true;
+		return data.results.map((item) => {
+			console.log(item);
+			even_or_odd = !even_or_odd;
+			let style_even_odd = even_or_odd ? styles.even:styles.odd;
+
+			return(
+				<View key={item.id} style={[style_even_odd, styles.drug_item]}>
+					<View style={{flex:7}}>
+						<Text style={styles.drug_header}>
+							{item.openfda.brand_name[0]}
+						</Text>
+						<Text>
+							{item.openfda.manufacturer_name}
+						</Text>
+						<Text>
+							{item.openfda.product_type}
+						</Text>
+						<Text>
+
+						</Text>
+					</View>
+					<View style={{flex:3, backgroundColor:"blue",
+						height: 70, borderRadius: 20, marginLeft: 40,
+						justifyContent: "flex-end", alignItems:"center", alignContent:"center", flexDirection: "row"}}
+						  onTouchStart={()=>this.props.store_item(item)}
+					>
+						<Text style={{alignItems:"center", alignContent:"center",
+							color:"white", justifyContent: "center", paddingRight:"25%"}}>
+							Store Drug
+						</Text>
+					</View>
+				</View>
+			)
+		})
 	}
 
 	change_input(text){

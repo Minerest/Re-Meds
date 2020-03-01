@@ -88,11 +88,12 @@ export default class App extends React.Component {
 	}
 
 	componentDidMount() {
-		console.log('mount');
 		this.db.transaction(tx => {
+			if (this.debugging)
+				tx.executeSql("drop table drugs", [], () => console.log("dropped"),
+					(t, e) => console.log(t, e));
 
-			tx.executeSql("drop table drugs", [], () => console.log("dropped"),
-				(t, e) => console.log(t, e));
+			// Create the SQLite database, need to do this on first launch.
 			tx.executeSql(
 				"create table if not exists drugs (id integer primary key not null, " +
 				"brand_name string, manufacturer_name string, do_not_use string, stop_use string," +
@@ -103,13 +104,14 @@ export default class App extends React.Component {
 				"active_ingredient string, drug_id integer references drugs(id));", [],
 				() => console.log("ing success"), (t, err) => console.log(t, err));
 		});
-
+		// Different UPC's for debugging purposes. Listerine, Tylenol, Advil, Coughsyrup and Claratin
 		let arr = ["0305360970858","0312547427555", "0305730169400","0300450449108", "0041100809643"];
 		if (this.debugging)
 			this.debug_fetcher(arr); // gets a set of drugs and stores them onstartup.
 	}
 
 	async goto_interactions(){
+		// renders the interactions View. This makes a web request based on the drugs stored on the database.
 		let data = await this.get_interactions();
 		console.log("GOTO INTERACTIONS DATA", data);
 		this.setState({
@@ -118,6 +120,7 @@ export default class App extends React.Component {
 	}
 
 	delete_item(item){
+		// Deletes an item from the database
 		this.db.transaction(tx => {
 			tx.executeSql(
 				"delete from drugs where brand_name = ?", [item], () => console.log("Success"),
@@ -127,8 +130,11 @@ export default class App extends React.Component {
 	}
 
 	async goto_drugs(){
-
+		// renders the drugs registered view.
 		let drugs = await this.get_drugs();
+
+		// The delete_item function is passed into the DrugMenu function.
+		// The drug menu renders a list of drugs and each drug has its own ID that will be passed to the delete_item funciton
 		this.setState({
 			currently_rendering: <DrugMenu delete_item={(brand_name) => this.delete_item(brand_name)}
 										   drugs={drugs} menu={this.change_to_menu}/>
@@ -136,12 +142,17 @@ export default class App extends React.Component {
 	}
 
 	goto_searchbar(){
+		// Renders the search view.
+		// The function add_data_to_database(item) will be called from within the searchbar view.
+
 		this.setState({currently_rendering: <SearchBar
 				store_item={(item) => this.add_data_to_database(item)}
 				menu={()=>this.change_to_menu()} />})
 	}
 
 	async get_interactions(){
+		// This function needs to be refactored. A lot of frusteration went into developing the interactions portion
+		// The biggest problem was handling the promises. It became immediately obvious to me that I barely know how to use promises
 		let p = new Promise((resolve, reject) => {
 				this.db.transaction(tx => {
 					tx.executeSql("select * from drugs", [], (t, r) => {
@@ -188,13 +199,16 @@ export default class App extends React.Component {
 					}, (t, e) => {
 						console.log(t, e)
 					})
-				})
+				});
 		return p;
 	}
 
 
 	add_data_to_database(data){
-		// I have to do this because the FDA assumes EVERYTHING is an array.
+		// stores items to the local database
+
+		// I have to do this because the FDA assumes EVERYTHING is an array and the field may not exist.
+		// If I try to store the item without checking if it exists, the app will crash.
 		let brand_name = data.openfda.brand_name ? data.openfda.brand_name[0] : null;
 		let manf_name = data.openfda.manufacturer_name ? data.openfda.manufacturer_name[0] : null;
 		let dnu = data.do_not_use ? data.do_not_use[0] : null;
@@ -204,15 +218,15 @@ export default class App extends React.Component {
 		let purpose = data.purpose ? data.purpose[0] : null;
 		let upc = data.openfda.upc ? data.openfda.upc[0] : null;
 		let rxcui = data.openfda.rxcui ? data.openfda.rxcui[0]: null;
+
+		// This is the statement that actually stores the data.
 		this.db.transaction(tx => {
 			tx.executeSql("insert into drugs (brand_name, manufacturer_name, do_not_use, stop_use," +
 				"dosage_and_administration, product_type, purpose, upc,rxcui) values(?, ?, ?, ?, ?, ?, ?, ?, ?)",
 				[brand_name, manf_name, dnu, stop_use, d_and_a, product_type, purpose, upc,rxcui],
 				() =>console.log("SUCCESS"),
 				(t, e) => console.log("INSERT ERROR",e, t));
-
 		});
-
 	}
 
 	toggle_upc_found(){
@@ -220,7 +234,9 @@ export default class App extends React.Component {
 	}
 
 	async check_db_for_upc(upc){
-			let p = new Promise((resolve, reject)=> {
+		// As you can see, this promise went a little more smoothly.
+		// This function checks the database to see if the UPC has been stored. If it has, no need to ask the FDA API.
+		let p = new Promise((resolve, reject)=> {
 
 				this.db.transaction(tx => {
 					tx.executeSql("select * from drugs where upc = (?);", [upc],
@@ -238,16 +254,16 @@ export default class App extends React.Component {
 	}
 
 	store_drug(data){
-		// console.log(data.results[0].openfda.upc[0]);
+		// TODO: Refactor
 		this.add_data_to_database(data.results[0]);
 	}
 
 	async get_drugs(){
+		// returns every row from the drugs array. Should only contain the drugs currently being taken
 		return new Promise((resolve, reject) => {
 			this.db.transaction(tx => {
 				tx.executeSql("select * from drugs;", null,
 					(tx, res) => {
-
 					resolve(res.rows);
 					}, (tx, err) => console.log(tx, err));
 			})
@@ -255,14 +271,17 @@ export default class App extends React.Component {
 	}
 
 	change_to_camera() {
+		// renders the barcode scanning view
 		this.setState({currently_rendering: this.state.appletts["BarcodeReader"]})
 	}
 
 	change_to_menu() {
+		// renders the main menu view
 		this.setState({currently_rendering: this.state.appletts["MainMenu"]})
 	}
 
 	render() {
+		// the render function of the current app.
 		return (
 			this.state.currently_rendering
 		);

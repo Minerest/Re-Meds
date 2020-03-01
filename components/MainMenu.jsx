@@ -8,10 +8,13 @@ import Content from './Content.jsx';
 class MainMenu extends React.Component {
 	constructor(props){
 		super(props);
-		this.sidebar_state = true;
+		this.sidebar_state = true; // TODO: Animate the sidebar.
 	}
 
 	render(){
+		// This is the beauty of react. Easy to see what is actually going on.
+		// You have a container, with a header, a sidebar, and the content all rendered at once
+		// the SideBar and Content tags are tags I created from scratch.
 		return(
 			<View style={{flex:1}}>
 				<Text style={stylez.Header}>RE:Meds</Text>

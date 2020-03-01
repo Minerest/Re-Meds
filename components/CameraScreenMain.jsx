@@ -6,18 +6,19 @@ import { BarCodeScanner } from 'expo-barcode-scanner';
 
 
 class CameraScreenMain extends React.Component {
-
+	// This is the view that handles all the barcode scanning which would be used to query the FDA API5
 	constructor(props) {
 		super(props);
 		this.state = {
 			hasCameraPermission: null, // This changes to "Granted" by the camera API once the users gives permission
 			type: Camera.Constants.Type.back, // Not the face camera, but the other camera on the phone
 			actively_scanning: true,	// bool to check to see if we're scanning barcodes rn or not.
-			error: ""
+			error: "" // used to print any errors
 		};
 	}
 
 	async componentDidMount() {
+		// first thing the app does is ask for permissions when the camera is rendered.
 		const {status} = await Permissions.askAsync(Permissions.CAMERA);
 		this.setState({
 			hasCameraPermission: status
@@ -59,17 +60,25 @@ class CameraScreenMain extends React.Component {
 		if (hasCameraPermission === null) {
 			return <View/>;
 		} else if (hasCameraPermission === false) {
-			return <Text>No access to camera</Text>;
+			return (
+				<View>
+					<Text>No access to camera</Text>
+					<View style={styles.menubutton} onTouchStart={this.props.menu}>
+						<Text>MAIN MENU</Text>
+					</View>
+				</View>);
 		} else {
 			return (
-				<View style={{flex: 1}}>
+				<View style={{flex: 1}}>  {/* container */}
 					<BarCodeScanner style={styles.camera} type={this.state.type}
 									onBarCodeScanned={!this.state.actively_scanning ? undefined : this.handleBarcodeScan}
 					/>
+					{/* this is a button that shows up when the barcode scanner is not actively scanning */}
 					{!this.state.actively_scanning && (<View  style={styles.textview}
 															  onTouchStart={() => this.setState({
 																  error: "",
 																  actively_scanning: true})}>
+
 						<Text>Scanned {this.state.error}</Text>
 					</View>)}
 					<View style={styles.menubutton} onTouchStart={this.props.menu}>

@@ -3,7 +3,7 @@ import { Text, View, StyleSheet } from 'react-native';
 
 
 class SideBar extends React.Component {
-
+	// creates the side bar buttons on the side.
 	render(){
 		return (
 			<View style={styles.sidebar}>

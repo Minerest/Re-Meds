@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 
 
 function Content(){
+	// contains some hipster lorem ipsum
 	return (
 		<View style={styles.content}>
 			<Text style={styles.content_text}>Tousled pitchfork cloud bread, adaptogen viral trust fund sartorial roof
