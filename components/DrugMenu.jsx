@@ -12,8 +12,9 @@ function DrugMenu(props) {
 			(item) => {
 				odd_or_even = i % 2 === 0 ? styles.odd : styles.even;
 				i++;
+				let k = item.upc ? item.upc : Math.random();
 				return(
-					<View style={[styles.drug_item, odd_or_even]} key={item.upc}>
+					<View style={[styles.drug_item, odd_or_even]} key={k}>
 						<Text style={styles.drug_header}>{item.brand_name}</Text>
 						<View style={{flex:5}}>
 							<Text style={styles.drug_subheader}>Purpose</Text>
@@ -31,6 +32,11 @@ function DrugMenu(props) {
 						<View style={{flex:8}}>
 							<Text style={styles.drug_subheader}>Dosage and Administration</Text>
 							<Text style={{flex:8}}>{item.dosage_and_administration}</Text>
+						</View>
+						<View onTouchStart={()=>{props.delete_item(item.brand_name)}}
+							  style={{backgroundColor:"red", flex:4, height: 60, marginTop: 30,
+							alignItems:"center", justifyContent: "center"}}>
+							<Text style={{marginTop:"auto", marginBottom:"auto"}}>Delete</Text>
 						</View>
 					</View>
 				)

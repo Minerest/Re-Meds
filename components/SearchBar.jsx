@@ -15,8 +15,10 @@ export class SearchBar extends React.Component {
 
 	search(){
 		const brand_name = this.current_text;
-		this.setState({editable:false});
-		fetch("https://api.fda.gov/drug/label.json?search=openfda.brand_name:" + brand_name + "&limit=100")
+		this.setState({
+			results:<Text style={{fontSize: 25, marginRight:"auto", marginLeft:"auto"}}>LOADING</Text>,
+			editable:false});
+		fetch('https://api.fda.gov/drug/label.json?search=openfda.brand_name:"' + brand_name + '"&limit=100')
 			.then(raw_data => raw_data.json())
 			.then(data => {
 				if (data.error){
@@ -26,15 +28,27 @@ export class SearchBar extends React.Component {
 				}
 				let even_or_odd = true;
 				let to_render = data.results.map((item) => {
+					console.log(item);
 					even_or_odd = !even_or_odd;
 					let style_even_odd = even_or_odd ? styles.even:styles.odd;
 
 					return(
 						<View key={item.id} style={[style_even_odd, styles.drug_item]}>
-							<Text style={styles.drug_header}>
-								{item.openfda.brand_name[0]}
-							</Text>
-							<View style={{flex:1, backgroundColor:"white",
+							<View style={{flex:8}}>
+								<Text style={styles.drug_header}>
+									{item.openfda.brand_name[0]}
+								</Text>
+								<Text>
+									{item.openfda.manufacturer_name}
+								</Text>
+								<Text>
+									{item.openfda.product_type}
+								</Text>
+								<Text>
+
+								</Text>
+							</View>
+							<View style={{flex:3, backgroundColor:"white",
 								height: 70,
 								justifyContent: "flex-end", alignItems:"center", alignContent:"center", flexDirection: "row"}}
 								onTouchStart={()=>this.props.store_item(item)}
@@ -56,7 +70,6 @@ export class SearchBar extends React.Component {
 	}
 
 	render(){
-		console.log(this.props);
 
 		const results = this.state.results;
 

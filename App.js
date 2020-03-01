@@ -75,6 +75,7 @@ export default class App extends React.Component {
 		this.get_interactions = this.get_interactions.bind(this);
 		this.goto_interactions = this.goto_interactions.bind(this);
 		this.goto_searchbar = this.goto_searchbar.bind(this);
+		this.delete_item = this.delete_item.bind(this);
 	}
 
 	debug_fetcher(arr){
@@ -116,11 +117,21 @@ export default class App extends React.Component {
 			});
 	}
 
+	delete_item(item){
+		this.db.transaction(tx => {
+			tx.executeSql(
+				"delete from drugs where brand_name = ?", [item], () => console.log("Success"),
+				() => {console.log("ERROR")}
+			);
+		})
+	}
+
 	async goto_drugs(){
 
 		let drugs = await this.get_drugs();
 		this.setState({
-			currently_rendering: <DrugMenu drugs={drugs} menu={this.change_to_menu}/>
+			currently_rendering: <DrugMenu delete_item={(brand_name) => this.delete_item(brand_name)}
+										   drugs={drugs} menu={this.change_to_menu}/>
 		});
 	}
 
@@ -150,6 +161,11 @@ export default class App extends React.Component {
 						let d = fetch(req_url)
 							.then(resp => resp.json())
 							.then(resp => {
+							if (!resp.fullInteractionTypeGroup){
+								console.log("NOT FOUND");
+								resolve(null);
+								return null;
+							}
 							let i = resp.fullInteractionTypeGroup[0].fullInteractionType;
 							drugs.interactions.push(i.map((item) => {
 								return ({
@@ -161,7 +177,10 @@ export default class App extends React.Component {
 						});
 
 						d.then(data => {
-							console.log(data);
+							if (!data){
+								return null
+							}
+
 							resolve(data);
 							return data})
 					});

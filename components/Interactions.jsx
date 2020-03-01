@@ -3,7 +3,7 @@ import {Text, View, StyleSheet, SafeAreaView, ScrollView} from 'react-native';
 
 export function Interactions(props){
 	// interactions is a function used to render drug interactions. The drug interactions are passed from the App.js data object
-	console.log("INTERACTIONS DATA", props.data);
+
 	let to_render = get_render(props.data);
 	return(
 		<View style={{backgroundColor: "#ccd4db", flex:1, justifyContent: "center", alignItems:"center"}}>
@@ -27,24 +27,30 @@ function get_render(data){
 
 	let style_object;
 	let i = 0;
-	return data.interactions[0].map( item => {
-		console.log("ITEM", item);
-		console.log("PAIR1", data);
-		// i is a counter to keep track of the color scheme.
-		i++;
-		style_object = i % 2 === 0 ? styles.pairEven : styles.pairOdd;
+	let to_render;
+	if (data){
 
-		return(
-			<View key={i} style={style_object}>
-				<View style={styles.pair}>
-					<Text style={styles.pairItem}>{data[item.pair[0]]}</Text>
-					<Text style={styles.pairItem}>{data[item.pair[1]]}</Text>
+		to_render = data.interactions[0].map( item => {
+
+			// i is a counter to keep track of the color scheme.
+			i++;
+			style_object = i % 2 === 0 ? styles.pairEven : styles.pairOdd;
+
+			return(
+				<View key={i} style={style_object}>
+					<View style={styles.pair}>
+						<Text style={styles.pairItem}>{data[item.pair[0]]}</Text>
+						<Text style={styles.pairItem}>{data[item.pair[1]]}</Text>
+					</View>
+					<Text style={{flex:1, margin: 20, fontSize: 20}}>{item.description}</Text>
 				</View>
-				<Text style={{flex:1, margin: 20, fontSize: 20}}>{item.description}</Text>
-			</View>
-		)
-
-	});
+			);
+		});
+	}
+	else {
+		to_render = <Text>No Interactions Found!!!</Text>
+	}
+	return to_render;
 
 }
 
