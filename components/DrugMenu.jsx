@@ -6,42 +6,8 @@ function DrugMenu(props) {
 		// console.log("PROPS", props.drugs._array);
 		// FIELDS: brand_name, manufacturer_name, do_not_use, stop_use," +
 		// "dosage_and_administration, product_type, purpose, upc
-		let i = 0;
-		let odd_or_even
-		const items_to_render = props.drugs._array.map(
-			(item) => {
-				odd_or_even = i % 2 === 0 ? styles.odd : styles.even;
-				i++;
-				let k = item.upc ? item.upc : Math.random();
-				return(
-					<View style={[styles.drug_item, odd_or_even]} key={k}>
-						<Text style={styles.drug_header}>{item.brand_name}</Text>
-						<View style={{flex:5}}>
-							<Text style={styles.drug_subheader}>Purpose</Text>
-							<Text style={{flex:5}}>{item.purpose}</Text>
-						</View>
-						<View style={{flex:5}}>
-							<Text style={styles.drug_subheader}>Stop Use</Text>
-							<Text style={{flex:5}}>{item.stop_use}</Text>
-						</View>
-						<View style={{flex:5}}>
-							<Text style={styles.drug_subheader}>Do Not Use</Text>
-							<Text style={{flex:5}}>{item.do_not_use}</Text>
-						</View>
-						{/*<Text style={{flex:1}}>{item.results[0].purpose}</Text>*/}
-						<View style={{flex:8}}>
-							<Text style={styles.drug_subheader}>Dosage and Administration</Text>
-							<Text style={{flex:8}}>{item.dosage_and_administration}</Text>
-						</View>
-						<View onTouchStart={()=>{props.delete_item(item.brand_name)}}
-							  style={{backgroundColor:"red", flex:4, height: 60, marginTop: 30,
-							alignItems:"center", justifyContent: "center"}}>
-							<Text style={{marginTop:"auto", marginBottom:"auto"}}>Delete</Text>
-						</View>
-					</View>
-				)
-			}
-		);
+		const items_to_render = get_drugs(props.drugs);
+		console.log("BEFORE RENDER");
 		return (
 			<View style={{backgroundColor: "#ccd4db", flex:1, justifyContent: "center", alignItems:"center"}}>
 				<Text style={styles.header}>Drug Registered</Text>
@@ -55,6 +21,44 @@ function DrugMenu(props) {
 				</View>
 			</View>
 		)
+}
+
+function get_drugs(drugs){
+	let i = 0;
+	let odd_or_even;
+	return drugs._array.map(
+		(item) => {
+			odd_or_even = i % 2 === 0 ? styles.odd : styles.even;
+			i++;
+			let k = item.upc ? item.upc : Math.random();
+			return(
+				<View style={[styles.drug_item, odd_or_even]} key={k}>
+					<Text style={styles.drug_header}>{item.brand_name}</Text>
+					<View style={{flex:5}}>
+						<Text style={styles.drug_subheader}>Purpose</Text>
+						<Text style={{flex:5}}>{item.purpose}</Text>
+					</View>
+					<View style={{flex:5}}>
+						<Text style={styles.drug_subheader}>Stop Use</Text>
+						<Text style={{flex:5}}>{item.stop_use}</Text>
+					</View>
+					<View style={{flex:5}}>
+						<Text style={styles.drug_subheader}>Do Not Use</Text>
+						<Text style={{flex:5}}>{item.do_not_use}</Text>
+					</View>
+					<View style={{flex:8}}>
+						<Text style={styles.drug_subheader}>Dosage and Administration</Text>
+						<Text style={{flex:8}}>{item.dosage_and_administration}</Text>
+					</View>
+					<View onTouchStart={()=>{props.delete_item(item.brand_name)}}
+						  style={{backgroundColor:"red", flex:4, height: 60, marginTop: 30,
+							  alignItems:"center", justifyContent: "center"}}>
+						<Text style={{marginTop:"auto", marginBottom:"auto"}}>Delete</Text>
+					</View>
+				</View>
+			)
+		}
+	);
 }
 
 const styles = StyleSheet.create({

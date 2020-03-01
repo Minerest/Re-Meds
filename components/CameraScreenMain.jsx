@@ -69,11 +69,11 @@ class CameraScreenMain extends React.Component {
 				</View>);
 		} else {
 			return (
-				<View style={{flex: 1}}>  {/* container */}
+				<View style={{flex: 1}}>
 					<BarCodeScanner style={styles.camera} type={this.state.type}
 									onBarCodeScanned={!this.state.actively_scanning ? undefined : this.handleBarcodeScan}
 					/>
-					{/* this is a button that shows up when the barcode scanner is not actively scanning */}
+
 					{!this.state.actively_scanning && (<View  style={styles.textview}
 															  onTouchStart={() => this.setState({
 																  error: "",

@@ -34,56 +34,26 @@ export class SearchBar extends React.Component {
 					return null;
 				}
 
-				// boolean to determine the color of the item.
+				// gets items to render from the output of the FDA API
 				let to_render = this.get_items(data);
-				//
-				// 	data.results.map((item) => {
-				// 	console.log(item);
-				// 	even_or_odd = !even_or_odd;
-				// 	let style_even_odd = even_or_odd ? styles.even:styles.odd;
-				//
-				// 	return(
-				// 		<View key={item.id} style={[style_even_odd, styles.drug_item]}>
-				// 			<View style={{flex:7}}>
-				// 				<Text style={styles.drug_header}>
-				// 					{item.openfda.brand_name[0]}
-				// 				</Text>
-				// 				<Text>
-				// 					{item.openfda.manufacturer_name}
-				// 				</Text>
-				// 				<Text>
-				// 					{item.openfda.product_type}
-				// 				</Text>
-				// 				<Text>
-				//
-				// 				</Text>
-				// 			</View>
-				// 			<View style={{flex:3, backgroundColor:"blue",
-				// 				height: 70, borderRadius: 20, marginLeft: 40,
-				// 				justifyContent: "flex-end", alignItems:"center", alignContent:"center", flexDirection: "row"}}
-				// 				onTouchStart={()=>this.props.store_item(item)}
-				// 			>
-				// 				<Text style={{alignItems:"center", alignContent:"center",
-				// 					color:"white", justifyContent: "center", paddingRight:"25%"}}>
-				// 					Store Drug
-				// 				</Text>
-				// 			</View>
-				// 		</View>
-				// 	)
-				// })
-				this.setState({results:to_render});
-			}).then(() => {this.setState({text_editable:true})})
+				// update what is rendering on this object based on the items above.
+				this.setState({
+					results: to_render
+				});
+			})
+			.then(() => {this.setState({text_editable:true})})
 
 	}
 
 	get_items(data){
 		// returns an array of items to be rendered
+		// boolean to alternate the color scheme
 		let even_or_odd = true;
 		return data.results.map((item) => {
-			console.log(item);
 			even_or_odd = !even_or_odd;
-			let style_even_odd = even_or_odd ? styles.even:styles.odd;
+			let style_even_odd = even_or_odd ? styles.even : styles.odd;
 
+			// The HTML-like stuff goes here
 			return(
 				<View key={item.id} style={[style_even_odd, styles.drug_item]}>
 					<View style={{flex:7}}>
@@ -96,11 +66,8 @@ export class SearchBar extends React.Component {
 						<Text>
 							{item.openfda.product_type}
 						</Text>
-						<Text>
-
-						</Text>
 					</View>
-					<View style={{flex:3, backgroundColor:"blue",
+					<View style={{flex:3, backgroundColor:"blue", // This is the button to store the drug
 						height: 70, borderRadius: 20, marginLeft: 40,
 						justifyContent: "flex-end", alignItems:"center", alignContent:"center", flexDirection: "row"}}
 						  onTouchStart={()=>this.props.store_item(item)}
@@ -111,8 +78,8 @@ export class SearchBar extends React.Component {
 						</Text>
 					</View>
 				</View>
-			)
-		})
+			);
+		});
 	}
 
 	change_input(text){
@@ -120,9 +87,9 @@ export class SearchBar extends React.Component {
 	}
 
 	render(){
-
-		const results = this.state.results;
-
+		console.log("Hello");
+		const results = this.state.results; // this gets rendered. Can be drugs, drug not found, or Loading indicator
+		console.log("World");
 		return(
 			<View style={{backgroundColor: "#ccd4db", flex:1}}>
 				<View style={{flex:1, margin: "auto", alignContent:"center", flexDirection:"row"}}>
