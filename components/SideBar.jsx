@@ -1,16 +1,21 @@
 import React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
-
+import Camera_icon from './../assets/camera_icon.png';
+import {Image} from 'react-native'
 
 class SideBar extends React.Component {
 	// creates the side bar buttons on the side.
 	render(){
 		return (
 			<View style={styles.sidebar}>
-				<Text style={styles.sidebar_option}
-				onTouchStart={this.props.cam}>
-					Camera
-				</Text>
+				<View style={[styles.sidebar_option, {marginTop:0}]}>
+					<Text style={{marginLeft:"auto", marginRight:"auto"}}
+					onTouchStart={this.props.cam}>
+						Camera
+
+					</Text>
+					<Image source={Camera_icon} style={{marginLeft:"auto", marginRight:"auto", borderRadius: 15, marginTop:10}}/>
+				</View>
 				<Text style={styles.sidebar_option}>
 					About Me
 				</Text>

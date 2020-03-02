@@ -16,7 +16,7 @@ class MainMenu extends React.Component {
 		// You have a container, with a header, a sidebar, and the content all rendered at once
 		// the SideBar and Content tags are tags I created from scratch.
 		return(
-			<View style={{flex:1}}>
+			<View style={{flex:1, backgroundColor: "#000"}}>
 				<Text style={stylez.Header}>RE:Meds</Text>
 				<View style={stylez.Container}>
 					<SideBar goto_interactions={this.props.goto_interactions}
@@ -36,10 +36,11 @@ const stylez = StyleSheet.create({
 		flexDirection: "row"
 	},
 	Header: {
-		fontSize: 40,
+		color:"white",
+		fontSize: 35,
 		fontWeight: "bold",
 		textAlign: "center",
-		paddingTop: 20,
+		paddingTop: 25,
 	}
 });
 

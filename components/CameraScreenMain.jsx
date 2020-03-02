@@ -4,14 +4,13 @@ import * as Permissions from 'expo-permissions';
 import { Camera } from 'expo-camera';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 
-
 class CameraScreenMain extends React.Component {
 	// This is the view that handles all the barcode scanning which would be used to query the FDA API5
 	constructor(props) {
 		super(props);
 		this.state = {
 			hasCameraPermission: null, // This changes to "Granted" by the camera API once the users gives permission
-			type: Camera.Constants.Type.back, // Not the face camera, but the other camera on the phone
+			// type: Camera.Constants.Type.back, // Not the face camera, but the other camera on the phone
 			actively_scanning: true,	// bool to check to see if we're scanning barcodes rn or not.
 			error: "" // used to print any errors
 		};
@@ -19,9 +18,10 @@ class CameraScreenMain extends React.Component {
 
 	async componentDidMount() {
 		// first thing the app does is ask for permissions when the camera is rendered.
-		const {status} = await Permissions.askAsync(Permissions.CAMERA);
+		const status = await BarCodeScanner.requestPermissionsAsync();
+
 		this.setState({
-			hasCameraPermission: status
+			hasCameraPermission: status.status
 		});
 	}
 
@@ -35,6 +35,7 @@ class CameraScreenMain extends React.Component {
 		let does_upc_exist = await this.props.check_db_for_upc(data);
 		if (does_upc_exist) {
 			this.props.toggle_upc();
+
 			return;
 		}
 		this.props.toggle_upc();
@@ -58,8 +59,11 @@ class CameraScreenMain extends React.Component {
 	render() {
 		const {hasCameraPermission} = this.state;
 		if (hasCameraPermission === null) {
-			return <View/>;
-		} else if (hasCameraPermission === false) {
+
+			return <Text>Requesting for camera permission</Text>;
+		}
+		else if (hasCameraPermission === false) {
+			console.log("NO ACCESS");
 			return (
 				<View>
 					<Text>No access to camera</Text>
@@ -67,13 +71,16 @@ class CameraScreenMain extends React.Component {
 						<Text>MAIN MENU</Text>
 					</View>
 				</View>);
-		} else {
-			return (
-				<View style={{flex: 1}}>
-					<BarCodeScanner style={styles.camera} type={this.state.type}
-									onBarCodeScanned={!this.state.actively_scanning ? undefined : this.handleBarcodeScan}
-					/>
+		}
+		else {
+			console.log("Camera loaded", hasCameraPermission);
 
+			return (
+				<View style={{flex: 1, flexDirection: "column", justifyContent:"flex-end"}}>
+					<BarCodeScanner
+						style={StyleSheet.absoluteFillObject}
+						onBarCodeScanned={!this.state.actively_scanning ? undefined : this.handleBarcodeScan}
+					/>
 					{!this.state.actively_scanning && (<View  style={styles.textview}
 															  onTouchStart={() => this.setState({
 																  error: "",
