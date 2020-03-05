@@ -1,5 +1,6 @@
 import React from 'react'
 import {Text, View, StyleSheet, ScrollView, SafeAreaView} from "react-native";
+import * as Haptic from 'expo-haptics';
 
 
 function DrugMenu(props) {
@@ -16,7 +17,7 @@ function DrugMenu(props) {
 						{items_to_render}
 					</ScrollView>
 				</SafeAreaView>
-				<View style={styles.menuView} onTouchStart={()=> props.menu()} >
+				<View style={styles.menuView} onTouchStart={()=> {Haptic.impactAsync("heavy"); props.menu()}} >
 					<Text style={styles.menuText} >Menu</Text>
 				</View>
 			</View>
@@ -50,7 +51,10 @@ function get_drugs(props){
 						<Text style={styles.drug_subheader}>Dosage and Administration</Text>
 						<Text style={{flex:8}}>{item.dosage_and_administration}</Text>
 					</View>
-					<View onTouchStart={()=>{props.delete_item(item.brand_name)}}
+					<View onTouchStart={()=>{
+						Haptic.impactAsync("heavy");
+						props.delete_item(item.brand_name);
+					}}
 						  style={{backgroundColor:"red", flex:4, height: 60, marginTop: 30,
 							  alignItems:"center", justifyContent: "center"}}>
 						<Text style={{marginTop:"auto", marginBottom:"auto"}}>Delete</Text>

@@ -1,5 +1,6 @@
 import React from 'react';
 import {Text, View, StyleSheet, SafeAreaView, ScrollView} from 'react-native';
+import * as Haptic from "expo-haptics";
 
 export function Interactions(props){
 	// interactions is a function used to render drug interactions. The drug interactions are passed from the App.js data object
@@ -13,7 +14,7 @@ export function Interactions(props){
 					{to_render}
 				</ScrollView>
 			</SafeAreaView>
-			<View style={styles.menuView} onTouchStart={()=>props.menu()} >
+			<View style={styles.menuView} onTouchStart={()=>{Haptic.impactAsync("heavy");props.menu()}} >
 				<Text style={styles.menuText} >Menu</Text>
 			</View>
 		</View>

@@ -17,7 +17,8 @@
     "react-native-web": "~0.11.7",
     "react-spring": "^8.0.27",
     "expo-permissions": "~8.0.0",
-    "expo-sqlite": "~8.0.0"
+    "expo-sqlite": "~8.0.0",
+    "expo-haptics": "~8.0.0"
   },
   "devDependencies": {
     "babel-preset-expo": "~8.0.0",

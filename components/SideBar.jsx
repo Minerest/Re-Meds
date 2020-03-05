@@ -1,33 +1,59 @@
 import React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
-import Camera_icon from './../assets/camera_icon.png';
 import {Image} from 'react-native'
+import * as Haptic from 'expo-haptics';
+
+// Icons
+import camera_icon from './../assets/camera_icon.png';
+import search_icon from './../assets/search_icon.png';
+import pill_bottle from './../assets/pill_bottle.png';
+import doctors_bag from './../assets/doctors_bag.png';
+import me from './../assets/cheif_of_medicine.png';
+
 
 class SideBar extends React.Component {
 	// creates the side bar buttons on the side.
 	render(){
+
 		return (
 			<View style={styles.sidebar}>
-				<View style={[styles.sidebar_option, {marginTop:0}]}>
-					<Text style={{marginLeft:"auto", marginRight:"auto"}}
-					onTouchStart={this.props.cam}>
+				<View onTouchStart={() => { Haptic.impactAsync("heavy"); this.props.cam();}
+				} style={[styles.sidebar_option, {marginTop:0}]}>
+					<Text style={{marginLeft:"auto", marginRight:"auto"}}>
 						Camera
-
 					</Text>
-					<Image source={Camera_icon} style={{marginLeft:"auto", marginRight:"auto", borderRadius: 15, marginTop:10}}/>
+					<Image source={camera_icon} style={{marginLeft:"auto", marginRight:"auto", borderRadius: 15, marginTop:15}}/>
 				</View>
-				<Text style={styles.sidebar_option}>
-					About Me
-				</Text>
-				<Text onTouchStart={this.props.goto_searchbar} style={styles.sidebar_option}>
-					Search
-				</Text>
-				<Text style={styles.sidebar_option} onTouchStart={this.props.goto_interactions}>
-					Drug Interactions
-				</Text>
-				<Text style={styles.sidebar_option} onTouchStart={this.props.goto_drugs}>
-					Drugs
-				</Text>
+				<View style={styles.sidebar_option}>
+					<Text style={{marginLeft:"auto", marginRight:"auto"}}>
+						About Me
+					</Text>
+					<Image source={me} style={{marginLeft:"auto", marginRight:"auto", borderRadius: 15, marginTop:15}}/>
+
+				</View>
+				<View onTouchStart={()=>{Haptic.impactAsync("heavy"); this.props.goto_searchbar();}}
+					  style={styles.sidebar_option}>
+					<Text style={{marginLeft:"auto", marginRight:"auto"}}>
+						Search
+					</Text>
+					<Image source={search_icon} style={{marginLeft:"auto", marginRight:"auto", borderRadius: 15, marginTop:15}}/>
+				</View>
+				<View style={styles.sidebar_option}
+					  onTouchStart={()=>{Haptic.impactAsync("heavy"); this.props.goto_interactions()}}>
+					<Text style={{marginLeft:"auto", marginRight:"auto", textAlign:"center"}} >
+						Drug Interactions
+					</Text>
+					<Image source={doctors_bag} style={{marginLeft:"auto", marginRight:"auto", marginTop:5}}/>
+
+				</View>
+				<View style={styles.sidebar_option}
+					  onTouchStart={()=>{Haptic.impactAsync("heavy");this.props.goto_drugs()}}>
+					<Text style={{marginLeft:"auto", marginRight:"auto"}}>
+						Drugs
+					</Text>
+					<Image source={pill_bottle} style={{marginLeft:"auto", marginRight:"auto", borderRadius: 15, marginTop:15}}/>
+
+				</View>
 			</View>
 		)
 	};

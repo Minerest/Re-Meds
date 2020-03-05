@@ -113,7 +113,6 @@ export default class App extends React.Component {
 	async goto_interactions(){
 		// renders the interactions View. This makes a web request based on the drugs stored on the database.
 		let data = await this.get_interactions();
-		console.log("GOTO INTERACTIONS DATA", data);
 		this.setState({
 				currently_rendering: <Interactions data={data}	menu={()=>this.change_to_menu()}/>
 			});

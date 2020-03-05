@@ -1,5 +1,6 @@
 import React from 'react';
 import {Text, StyleSheet, View, TextInput, ScrollView, SafeAreaView} from 'react-native';
+import * as Haptic from "expo-haptics";
 
 
 export class SearchBar extends React.Component {
@@ -70,7 +71,7 @@ export class SearchBar extends React.Component {
 					<View style={{flex:3, backgroundColor:"blue", // This is the button to store the drug
 						height: 70, borderRadius: 20, marginLeft: 40,
 						justifyContent: "flex-end", alignItems:"center", alignContent:"center", flexDirection: "row"}}
-						  onTouchStart={()=>this.props.store_item(item)}
+						  onTouchStart={()=>{Haptic.impactAsync("heavy"); this.props.store_item(item)}}
 					>
 						<Text style={{alignItems:"center", alignContent:"center",
 							color:"white", justifyContent: "center", paddingRight:"25%"}}>
@@ -103,7 +104,7 @@ export class SearchBar extends React.Component {
 						{results}
 					</ScrollView>
 				</View>
-				<View style={styles.menuView} onTouchStart={()=>this.props.menu()} >
+				<View style={styles.menuView} onTouchStart={()=>{Haptic.impactAsync("heavy");this.props.menu()}} >
 					<Text style={styles.menuText} >Menu</Text>
 				</View>
 			</View>

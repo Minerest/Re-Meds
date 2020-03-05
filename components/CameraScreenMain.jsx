@@ -3,6 +3,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import * as Permissions from 'expo-permissions';
 import { Camera } from 'expo-camera';
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import * as Haptic from "expo-haptics";
+
 
 class CameraScreenMain extends React.Component {
 	// This is the view that handles all the barcode scanning which would be used to query the FDA API5
@@ -32,6 +34,8 @@ class CameraScreenMain extends React.Component {
 
 		// Make sure to stop scanning after a barcode is read.
 		this.setState({actively_scanning: false});
+
+		Haptic.impactAsync("heavy");
 		let does_upc_exist = await this.props.check_db_for_upc(data);
 		if (does_upc_exist) {
 			this.props.toggle_upc();
@@ -88,7 +92,7 @@ class CameraScreenMain extends React.Component {
 
 						<Text>Scanned {this.state.error}</Text>
 					</View>)}
-					<View style={styles.menubutton} onTouchStart={this.props.menu}>
+					<View style={styles.menubutton} onTouchStart={()=>{Haptic.impactAsync("heavy");this.props.menu()}}>
 						<Text>MAIN MENU</Text>
 					</View>
 				</View>
