@@ -1,5 +1,5 @@
 import React from 'react'
-import {Text, View, StyleSheet, ScrollView, SafeAreaView} from "react-native";
+import {Text, View, StyleSheet, ScrollView, SafeAreaView, BackHandler} from "react-native";
 import * as Haptic from 'expo-haptics';
 
 
@@ -7,7 +7,10 @@ function DrugMenu(props) {
 		// console.log("PROPS", props.drugs._array);
 		// FIELDS: brand_name, manufacturer_name, do_not_use, stop_use," +
 		// "dosage_and_administration, product_type, purpose, upc
-		const items_to_render = get_drugs(props);
+
+	useBackButton(() => props.menu());
+
+	const items_to_render = get_drugs(props);
 		console.log("BEFORE RENDER");
 		return (
 			<View style={{backgroundColor: "#ccd4db", flex:1, justifyContent: "center", alignItems:"center"}}>
@@ -63,6 +66,20 @@ function get_drugs(props){
 			)
 		}
 	);
+}
+
+function useBackButton(handler) {
+
+	useEffect(() => {
+		BackHandler.addEventListener("hardwareBackPress", handler);
+
+		return () => {
+			BackHandler.removeEventListener(
+				"hardwareBackPress",
+				handler
+			);
+		};
+	}, [handler]);
 }
 
 const styles = StyleSheet.create({

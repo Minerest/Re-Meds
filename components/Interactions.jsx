@@ -1,10 +1,11 @@
 import React from 'react';
-import {Text, View, StyleSheet, SafeAreaView, ScrollView} from 'react-native';
+import {Text, View, StyleSheet, SafeAreaView, ScrollView, BackHandler} from 'react-native';
 import * as Haptic from "expo-haptics";
 
 export function Interactions(props){
 	// interactions is a function used to render drug interactions. The drug interactions are passed from the App.js data object
 
+	useBackButton(() => props.menu());
 	let to_render = get_render(props.data);
 	return(
 		<View style={{backgroundColor: "#ccd4db", flex:1, justifyContent: "center", alignItems:"center"}}>
@@ -53,6 +54,21 @@ function get_render(data){
 	}
 	return to_render;
 
+}
+
+
+function useBackButton(handler) {
+
+	useEffect(() => {
+		BackHandler.addEventListener("hardwareBackPress", handler);
+
+		return () => {
+			BackHandler.removeEventListener(
+				"hardwareBackPress",
+				handler
+			);
+		};
+	}, [handler]);
 }
 
 const styles = StyleSheet.create({

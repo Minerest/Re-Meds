@@ -1,9 +1,11 @@
 import React from 'react';
 import {Text, StyleSheet, View, TextInput, ScrollView, SafeAreaView} from 'react-native';
 import * as Haptic from "expo-haptics";
+import {BackHandler} from "react-native";
 
 
 export class SearchBar extends React.Component {
+
 	constructor(props){
 		super(props);
 		this.current_text = "";
@@ -13,6 +15,17 @@ export class SearchBar extends React.Component {
 		}
 	}
 
+	componentDidMount() {
+		this.backhandler = BackHandler.addEventListener("hardwareBackPress", this.handleBackPress)
+	}
+
+	componentWillUnmount() {
+		this.backhandler.remove();
+	}
+
+	handleBackPress = () => {
+		this.props.menu();
+	};
 
 	search(){
 		// This is the search function. It queries the FDA API for drugs based by name

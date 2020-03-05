@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import {BackHandler, StyleSheet, Text, View} from 'react-native';
 import * as Permissions from 'expo-permissions';
 import { Camera } from 'expo-camera';
 import { BarCodeScanner } from 'expo-barcode-scanner';
@@ -18,9 +18,19 @@ class CameraScreenMain extends React.Component {
 		};
 	}
 
+
+	componentWillUnmount() {
+		this.backhandler.remove();
+	}
+
+	handleBackPress = () => {
+		this.props.menu();
+	};
+
 	async componentDidMount() {
 		// first thing the app does is ask for permissions when the camera is rendered.
 		const status = await BarCodeScanner.requestPermissionsAsync();
+		this.backhandler = BackHandler.addEventListener("hardwareBackPress", this.handleBackPress)
 
 		this.setState({
 			hasCameraPermission: status.status
